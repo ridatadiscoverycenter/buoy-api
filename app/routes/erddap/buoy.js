@@ -48,10 +48,11 @@ const utils = require('../../utils');
 
 router.get('/query', (req, res) => {
   const ids = req.query.ids.split(',');
+  const variable = req.query.variable;
   const payload = {
     ids,
     datasetId: req.query.datasetId,
-    variable: req.query.variable,
+    variable,
     start: req.query.start,
     end: req.query.end
   };
@@ -67,12 +68,10 @@ router.get('/query', (req, res) => {
           return feature.properties;
         });
 
-        let filtered = processed.filter((arr) => arr[this.variable] !== null);
+        let filtered = processed.filter((arr) => arr[variable] !== null);
 
         if (filtered.length > numPoints) {
-          console.log(filtered.length);
-          filtered = utils.downsample(filtered, numPoints);
-          console.log(filtered.length);
+          filtered = utils.downsample(filtered, numPoints, variable);
         };
 
         return filtered;
