@@ -1,7 +1,10 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const { getMultiBuoyGeoJsonData, getBuoysCoordinates } = require('../../clients/erddap');
-const utils = require('../../utils');
+const {
+  getMultiBuoyGeoJsonData,
+  getBuoysCoordinates,
+} = require("../../clients/erddap");
+const utils = require("../../utils");
 /**
  * @swagger
  * /erddap/buoy/query:
@@ -44,43 +47,41 @@ const utils = require('../../utils');
  *
  */
 
-// Ex:  http://localhost:3004/erddap/buoy/query?datasetId=combined_e784_bee5_492e&ids=bid2&variable=WaterTempSurface&start=2010-07-01T12:00:00Z&end=2010-07-05T12:00:00Z
+// Ex:  http://localhost:3004/erddap/buoy/query?datasetId=combined_e784_bee5_492e&ids=bid2,bid3&variable=WaterTempSurface&start=2010-07-01T12:00:00Z&end=2010-07-05T12:00:00Z
 
-router.get('/query', (req, res) => {
-  const ids = req.query.ids.split(',');
+router.get("/query", (req, res) => {
+  const ids = req.query.ids.split(",");
   const variable = req.query.variable;
   const payload = {
     ids,
     datasetId: req.query.datasetId,
     variable,
     start: req.query.start,
-    end: req.query.end
+    end: req.query.end,
   };
   const numPoints = req.query.numPoints || 1000;
 
-  return Promise.all(getMultiBuoyGeoJsonData(payload)).then(
-    (response) => {
-      // console.log(response);
-      const data = response.map((datum) => {
+  return Promise.all(getMultiBuoyGeoJsonData(payload)).then((response) => {
+    // console.log(response);
+    const data = response.map((datum) => {
+      if (datum.hasOwnProperty("data")) {
         let processed = datum.data.features.map((feature) => {
           const date = new Date(feature.properties.time);
           feature.properties.time = date;
           return feature.properties;
         });
 
-        let filtered = processed.filter((arr) => arr[variable] !== null);
+        // TODO: to filter or not to filter?
+        // let filtered = processed.filter((arr) => arr[variable] !== null);
 
-        if (filtered.length > numPoints) {
-          filtered = utils.downsample(filtered, numPoints, variable);
-        };
+        return utils.downsample(processed, numPoints, variable);
+      } else {
+        return [];
+      }
+    });
 
-        return filtered;
-      });
-
-      res.send(data.reduce((a, b) => a.concat(b), []));
-    }
-  );
-
+    res.send(data.reduce((a, b) => a.concat(b), []));
+  });
 });
 
 /**
@@ -100,23 +101,20 @@ router.get('/query', (req, res) => {
  *
  */
 
-// Ex:  http://localhost:3004/erddap/buoy/coordinates?ids=bid2
+// Ex:  http://localhost:3004/erddap/buoy/coordinates?ids=bid2,bid3
 
-router.get('/coordinates', (req, res) => {
-  const ids = req.query.ids.split(',');
-  return Promise.all(getBuoysCoordinates({ids})).then(
-    (response) => {
-      const data = response.map((buoy) => {
-        return {
-          latitude: buoy.data.features[0].geometry.coordinates[1],
-          longitude: buoy.data.features[0].geometry.coordinates[0],
-          buoyId: buoy.data.features[0].properties.station_name
-        };
-      });
-      res.send(data);
-    }
-  );
-
+router.get("/coordinates", (req, res) => {
+  const ids = req.query.ids.split(",");
+  return Promise.all(getBuoysCoordinates({ ids })).then((response) => {
+    const data = response.map((buoy) => {
+      return {
+        latitude: buoy.data.features[0].geometry.coordinates[1],
+        longitude: buoy.data.features[0].geometry.coordinates[0],
+        buoyId: buoy.data.features[0].properties.station_name,
+      };
+    });
+    res.send(data);
+  });
 });
 
 module.exports = router;
