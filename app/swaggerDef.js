@@ -1,7 +1,7 @@
 /* istanbul ignore next */
 // This file is an example, it's not functionally used by the module.This
 
-const host = `http://${process.env.IP}:${process.env.PORT}`;
+const host = `${process.env.HOST}:${process.env.PORT}`;
 
 module.exports = {
   definition: {
@@ -14,5 +14,5 @@ module.exports = {
     host, // Host (optional)
     basePath: '/', // Base path (optional),
   },
-  apis: ['app/routes/*.js'] 
+  apis: ['app/routes/**/*.js'] 
 };

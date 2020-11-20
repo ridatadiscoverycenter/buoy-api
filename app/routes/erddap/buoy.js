@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { getMultiBuoyGeoJsonData } = require('../../clients/erddap');
+const { getMultiBuoyGeoJsonData, getBuoysCoordinates } = require('../../clients/erddap');
 /**
  * @swagger
- * /:
+ * /erddap/buoy:
  *   get:
  *     description: Get Data from ERDDAP
  *     parameters:
@@ -50,7 +50,6 @@ router.get('/buoy', (req, res) => {
     end: req.query.end
   };
 
-  console.log(payload);
   return Promise.all(getMultiBuoyGeoJsonData(payload)).then(
     (response) => {
       console.log(response);
@@ -65,6 +64,42 @@ router.get('/buoy', (req, res) => {
     }
   );
     
+});
+
+/**
+ * @swagger
+ * /erddap/buoy/coordinates:
+ *   get:
+ *     description: Get Buoy Coordinates from ERDDAP
+ *     parameters:
+ *      - name: ids
+ *        in: query
+ *        description: Buoy IDs, comma separated
+ *        required: true
+ *        type: string
+ *     responses:
+ *       200:
+ *         description: Success! New content is now available.
+ * 
+ */
+
+// Ex:  http://localhost:3004/erddap/buoy/coordinates?ids=bid2
+
+router.get('/buoy/coordinates', (req, res) => {
+  const ids = req.query.ids.split(',');
+  return Promise.all(getBuoysCoordinates({ids})).then(
+    (response) => {
+      const data = response.map((buoy) => {
+        return {
+          latitude: buoy.data.features[0].geometry.coordinates[1],
+          longitude: buoy.data.features[0].geometry.coordinates[0],
+          buoyId: buoy.data.features[0].properties.station_name
+        };
+      });
+      res.send(data);
+    }
+  );
+  
 });
     
 module.exports = router;
