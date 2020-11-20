@@ -2,19 +2,24 @@
   "name": "buoy-api",
   "version": "0.0.1",
   "description": "Proxy API for processing and serving ERDDAP data",
-  "main": "server.js",
+  "main": "app/server.js",
   "author": "Fernando Gelin, Mary McGrath",
   "license": "MIT",
   "scripts": {
     "start": "node app/server.js",
     "dev": "nodemon app/server.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha",
     "jsdoc": "jsdoc app/server.js",
     "swagger": "swagger-jsdoc -d app/swaggerDef.js app/routes/content.js",
     "commit": "git-cz"
   },
   "devDependencies": {
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
+    "cz-conventional-changelog": "^3.3.0",
     "eslint": "^7.13.0",
+    "git-cz": "^4.7.4",
+    "mocha": "^8.2.1",
     "prettier": "^2.1.2"
   },
   "dependencies": {

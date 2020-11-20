@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getMultiBuoyGeoJsonData } = require('../utils');
+const { getMultiBuoyGeoJsonData } = require('../../clients/erddap');
 /**
  * @swagger
  * /:
@@ -27,7 +27,7 @@ const { getMultiBuoyGeoJsonData } = require('../utils');
  *        description: Start Time
  *        required: true
  *        type: datetime
-  *      - name: end
+ *      - name: end
  *        in: query
  *        description: End Time
  *        required: true
@@ -38,16 +38,17 @@ const { getMultiBuoyGeoJsonData } = require('../utils');
  * 
  */
 
-// Ex:  http://localhost:3004/?datasetId=combined_e784_bee5_492e&ids=bid2&variable=WaterTempSurface&start=2010-07-01T12:00:00Z&end=2010-07-05T12:00:00Z
+// Ex:  http://localhost:3004/erddap/buoy?datasetId=combined_e784_bee5_492e&ids=bid2&variable=WaterTempSurface&start=2010-07-01T12:00:00Z&end=2010-07-05T12:00:00Z
 
-router.get('/', (req, res) => { 
+router.get('/buoy', (req, res) => { 
   const ids = req.query.ids.split(',');
   const payload = {
     ids, 
     datasetId: req.query.datasetId, 
     variable: req.query.variable,
     start: req.query.start, 
-    end: req.query.end};
+    end: req.query.end
+  };
 
   console.log(payload);
   return Promise.all(getMultiBuoyGeoJsonData(payload)).then(
