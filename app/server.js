@@ -24,8 +24,8 @@ app.use(
   swaggerUi.setup(specs)
 );
 
-const erddapRoutes = require('./routes/erddap/index');
-erddapRoutes.map(route => app.use('/erddap', route));
+const erddapRouter = require('./routes/erddap/index');
+app.use('/erddap', erddapRouter);
 
 app.listen(port, () => console.log(`Buoy Proxy API listening on port ${port}!`));
 
