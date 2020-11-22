@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { getMultiBuoyGeoJsonData, getBuoysCoordinates } = require('../../clients/erddap');
 const utils = require('../../utils');
+const buoys = require('./utils');
 /**
  * @swagger
  * /erddap/buoy/query:
@@ -27,12 +28,12 @@ const utils = require('../../utils');
  *        in: query
  *        description: Start Time
  *        required: true
- *        type: datetime
+ *        type: string
  *      - name: end
  *        in: query
  *        description: End Time
  *        required: true
- *        type: datetime
+ *        type: string
  *      - name: numPoints
  *        in: query
  *        description: max number of points to return
@@ -73,11 +74,9 @@ router.get('/query', (req, res) => {
           console.log(filtered.length);
           filtered = utils.downsample(filtered, numPoints);
           console.log(filtered.length);
-        };
-
+        }
         return filtered;
       });
-
       res.send(data.reduce((a, b) => a.concat(b), []));
     }
   );
@@ -118,6 +117,50 @@ router.get('/coordinates', (req, res) => {
     }
   );
 
+});
+
+router.get('/summary', (req, res) => {
+  const ids = buoys.ids;
+  const variable = buoys.variables.join(',');
+  fetchDataGeoJson({ variable, ids }).then((response) => {
+    const d = response.map((data) =>
+      data.map((datum) => {
+        const date = new Date(datum.time);
+        datum.time = `${date.getFullYear()}_${date.getMonth() + 1}`;
+        return datum;
+      })
+    );
+    const grouped = d
+      .map((buoyData) => {
+        const result = {
+          [buoyData[0].station_name]: _.groupBy(buoyData, 'time')
+        };
+        return result;
+      })
+      .reduce((a, b) => Object.assign(a, b));
+    const reduced = Object.keys(grouped).map((k) => {
+      return Object.keys(grouped[k]).map((date) => {
+        const result = grouped[k][date]
+          .map((obj) => {
+            const newObj = {};
+            state().variables.forEach((v) => {
+              newObj[v] = obj[v] ? 1 : 0;
+            });
+            return newObj;
+          })
+          .reduce((a, b) => {
+            const newObj = {};
+            state().variables.forEach((v) => (newObj[v] = a[v] + b[v]));
+            newObj.date = new Date(date.replace('_', '/') + '/01');
+            newObj.station = k;
+            return newObj;
+          });
+        return result;
+      });
+    });
+    const final = reduced.reduce((a, b) => a.concat(b));
+    res.send(final);
+  });
 });
 
 module.exports = router;

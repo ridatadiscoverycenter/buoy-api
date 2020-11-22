@@ -25,7 +25,6 @@ describe('Buoy', () => {
     });  
   });
 
-
   describe('GET /erddap/coordinates', () => {
     it('should get bouy coordinates', (done) => {
       chai.request(app)

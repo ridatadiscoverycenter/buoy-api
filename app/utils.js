@@ -3,8 +3,8 @@ const downsample = (data, numPoints) => {
   const mod = Math.floor(data.length / numPoints);
   console.log(mod);
   return data.filter((val, idx) => idx % mod == 0);
-}
+};
 
 module.exports = {
   downsample
-}
+};
