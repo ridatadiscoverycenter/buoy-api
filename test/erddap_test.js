@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 const chai = require('chai');
 const chaiHttp = require('chai-http');
-const app = require('../app/server');
+const app = require('@/server');
 
 chai.use(chaiHttp);
 chai.should();
@@ -9,7 +9,6 @@ chai.should();
 
 describe('Buoy', () => {
   describe('GET /erddap/buoy', () => {
-    // Test to get all students record
     it('should get buoy data', (done) => {
       chai.request(app)
         .get('/erddap/buoy?datasetId=combined_e784_bee5_492e&ids=bid2&variable=WaterTempSurface&start=2010-07-01T12:00:00Z&end=2010-07-02T12:00:00Z')

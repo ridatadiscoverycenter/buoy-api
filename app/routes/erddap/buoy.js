@@ -67,6 +67,8 @@ router.get('/query', (req, res) => {
         let processed = datum.data.features.map((feature) => {
           const date = new Date(feature.properties.time);
           feature.properties.time = date;
+          feature.properties.buoyId = feature.properties.station_name;
+          feature.properties.station_name = buoys.stationMap[feature.properties.buoyId];
           return feature.properties;
         });
 
@@ -110,11 +112,31 @@ router.get('/coordinates', (req, res) => {
         latitude: buoy.data.features[0].geometry.coordinates[1],
         longitude: buoy.data.features[0].geometry.coordinates[0],
         buoyId: buoy.data.features[0].properties.station_name,
+        station_name: buoys.stationMap[buoy.data.features[0].properties.station_name]
       };
     });
     res.send(data);
   });
 });
+
+/**
+ * @swagger
+ * /erddap/buoy/summary:
+ *   get:
+ *     description: Get Buoy Coordinates from ERDDAP
+ *     parameters:
+ *      - name: end
+ *        in: query
+ *        description: End Date
+ *        required: true
+ *        type: string
+ *     responses:
+ *       200:
+ *         description: Success! New content is now available.
+ *
+ */
+
+// Ex:  http://localhost:3004/erddap/buoy/summary?end=2010-07-05T12:00:00Z
 
 router.get('/summary', cacheMiddleware, (req, res) => {
   const end = req.query.end;
@@ -174,7 +196,10 @@ router.get('/summary', cacheMiddleware, (req, res) => {
             return result;
           });
         });
-        const final = reduced.reduce((a, b) => a.concat(b));
+        const final = reduced.reduce((a, b) => a.concat(b)).map(d => {
+          d.station_name = buoys.stationMap[d.station];
+          return d;
+        });
         res.send(final);
       })
     .catch(err => console.log(err));

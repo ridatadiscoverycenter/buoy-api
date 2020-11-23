@@ -32,7 +32,25 @@ const variables = [
   'SalinitySurface'
 ];
 
+const stationMap = {
+  bid2: 'N. Prudence',
+  bid3: 'Conimicut Pt',
+  bid4: 'Upper Bay Winter Station',
+  bid5: 'Bullocks Reach',
+  bid6: 'Mnt. View',
+  bid7: 'Quonset Pt',
+  bid8: 'Mnt. Hope Bay',
+  bid9: 'Poppasquash Pt',
+  bid10: 'Sally Rock',
+  bid13: 'Unknown',
+  bid15: 'Greenwich Bay',
+  bid16: 'Unknown',
+  bid17: 'GSO Dock',
+  bid21: 'Station II'
+};
+
 module.exports = {
   ids,
-  variables
+  variables,
+  stationMap
 };
