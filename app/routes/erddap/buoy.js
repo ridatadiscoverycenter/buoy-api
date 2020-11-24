@@ -5,6 +5,9 @@ const { getMultiBuoyGeoJsonData, getBuoysCoordinates } = require('@/clients/erdd
 const utils = require('@/utils');
 const buoys = require('@/routes/erddap/utils');
 const { cacheMiddleware } = require('@/middleware/cache');
+const aq = require('arquero');
+const op = aq.op;
+
 /**
  * @swagger
  * /erddap/buoy/query:
@@ -138,7 +141,7 @@ router.get('/coordinates', (req, res) => {
 
 // Ex:  http://localhost:3004/erddap/buoy/summary?end=2010-07-05T12:00:00Z
 
-router.get('/summary', cacheMiddleware, (req, res) => {
+router.get('/summary', cacheMiddleware, (req, res) => { 
   const end = req.query.end;
   const ids = buoys.ids;
   const variable = buoys.variables.join(',');
@@ -155,51 +158,35 @@ router.get('/summary', cacheMiddleware, (req, res) => {
         const data = response.map((datum) => {
           console.log(datum);
           return datum.data?.features.map((feature) => {
-            const date = new Date(feature.properties.time);
-            feature.properties.time = date;
             return feature.properties;
           });
         });
-        const init = data.map((data) =>
-          data?.map((datum) => {
-            const date = new Date(datum.time);
-            datum.time = `${date.getFullYear()}_${date.getMonth() + 1}`;
-            console.log(datum.time);
-            return datum;
-          })
-        );
-        const grouped = init
-          .map((buoyData) => {
-            const result = {
-              [buoyData?.[0].station_name]: _.groupBy(buoyData, 'time')
-            };
-            return result;
-          })
-          .reduce((a, b) => Object.assign(a, b));
-        const reduced = Object.keys(grouped).map((k) => {
-          return Object.keys(grouped[k]).map((date) => {
-            const result = grouped[k][date]
-              .map((obj) => {
-                const newObj = {};
-                buoys.variables.forEach((v) => {
-                  newObj[v] = obj[v] ? 1 : 0;
-                });
-                return newObj;
-              })
-              .reduce((a, b) => {
-                const newObj = {};
-                buoys.variables.forEach((v) => (newObj[v] = a[v] + b[v]));
-                newObj.date = new Date(date.replace('_', '/') + '/01');
-                newObj.station = k;
-                return newObj;
-              });
-            return result;
+
+        const rollupObject = {};
+        buoys.variables.forEach(v => {
+          rollupObject[v] = op.valid(v);
+        });
+
+        const processed = data.map((d) => {
+          let dt = aq.from(d)
+            .derive({
+              dt_ym: (d) =>
+                op.datetime(op.year(d.time), op.month(d.time)),
+              station_id: (d) => d.station_name
+            })
+            .groupby('station_id', 'dt_ym')
+            .rollup(rollupObject)
+            .objects();
+          return dt;
+        });
+
+        const final = processed
+          .reduce((a, b) => a.concat(b))
+          .map(d => {
+            d.station_name = buoys.stationMap[d.station_id];
+            return d;
           });
-        });
-        const final = reduced.reduce((a, b) => a.concat(b)).map(d => {
-          d.station_name = buoys.stationMap[d.station];
-          return d;
-        });
+
         res.send(final);
       })
     .catch(err => console.log(err));
