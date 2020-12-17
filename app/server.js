@@ -6,9 +6,10 @@ const createError = require('http-errors');
 const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 const swaggerOptions = require('@/swaggerDef');
+const { initialCache } = require('@/init');
 
 const app = express();
-const port = 3004;
+const port = 8080;
 
 const specs = swaggerJsdoc(swaggerOptions);
 
@@ -27,6 +28,9 @@ app.use('/erddap', erddapRouter);
 app.listen(port, () =>
   console.log(`Buoy Proxy API listening on port ${port}!`)
 );
+
+// initialize cache
+initialCache();
 
 app.use(function (_req, _res, next) {
   next(createError(404));

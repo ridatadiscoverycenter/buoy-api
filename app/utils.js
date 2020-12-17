@@ -1,5 +1,7 @@
 const aq = require('arquero');
 const op = aq.op;
+const buoys = require('@/routes/erddap/utils');
+const { getMultiBuoyGeoJsonData } = require('@/clients/erddap');
 
 aq.addFunction('sixhours', (x) => {
   if (x < 6) {
@@ -72,6 +74,49 @@ const downsample = (data, numPoints, variable) => {
     .objects();
 };
 
+// summarize buoy data
+const summarize = async (payload) => {
+  return Promise.all(getMultiBuoyGeoJsonData(payload))
+    .then(
+      (response) => {
+        const data = response.map((datum) => {
+          console.log(datum);
+          return datum.data?.features.map((feature) => {
+            return feature.properties;
+          });
+        });
+
+        const rollupObject = {};
+        buoys.variables.forEach(v => {
+          rollupObject[v] = op.valid(v);
+        });
+
+        const processed = data.map((d) => {
+          let dt = aq.from(d)
+            .derive({
+              dt_ym: (d) =>
+                op.datetime(op.year(d.time), op.month(d.time)),
+              station_id: (d) => d.station_name
+            })
+            .groupby('station_id', 'dt_ym')
+            .rollup(rollupObject)
+            .objects();
+          return dt;
+        });
+
+        const final = processed
+          .reduce((a, b) => a.concat(b), [])
+          .map(d => {
+            d.station_name = buoys.stationMap[d.station_id];
+            return d;
+          });
+
+        return final;
+      })
+    .catch(err => err);
+};
+
 module.exports = {
   downsample,
+  summarize
 };

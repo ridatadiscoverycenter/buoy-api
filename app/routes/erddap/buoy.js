@@ -1,12 +1,9 @@
 const express = require('express');
-const _ = require('lodash');
 const router = express.Router();
 const { getMultiBuoyGeoJsonData, getBuoysCoordinates } = require('@/clients/erddap');
 const utils = require('@/utils');
 const buoys = require('@/routes/erddap/utils');
 const { cacheMiddleware } = require('@/middleware/cache');
-const aq = require('arquero');
-const op = aq.op;
 
 /**
  * @swagger
@@ -141,7 +138,7 @@ router.get('/coordinates', (req, res) => {
 
 // Ex:  http://localhost:3004/erddap/buoy/summary?end=2010-07-05T12:00:00Z
 
-router.get('/summary', cacheMiddleware, (req, res) => { 
+router.get('/summary', cacheMiddleware, async (req, res) => { 
   const end = req.query.end;
   const ids = buoys.ids;
   const variable = buoys.variables.join(',');
@@ -152,44 +149,7 @@ router.get('/summary', cacheMiddleware, (req, res) => {
     start: '2000-07-01T12:00:00Z',
     end
   };
-  return Promise.all(getMultiBuoyGeoJsonData(payload))
-    .then(
-      (response) => {
-        const data = response.map((datum) => {
-          console.log(datum);
-          return datum.data?.features.map((feature) => {
-            return feature.properties;
-          });
-        });
-
-        const rollupObject = {};
-        buoys.variables.forEach(v => {
-          rollupObject[v] = op.valid(v);
-        });
-
-        const processed = data.map((d) => {
-          let dt = aq.from(d)
-            .derive({
-              dt_ym: (d) =>
-                op.datetime(op.year(d.time), op.month(d.time)),
-              station_id: (d) => d.station_name
-            })
-            .groupby('station_id', 'dt_ym')
-            .rollup(rollupObject)
-            .objects();
-          return dt;
-        });
-
-        const final = processed
-          .reduce((a, b) => a.concat(b))
-          .map(d => {
-            d.station_name = buoys.stationMap[d.station_id];
-            return d;
-          });
-
-        res.send(final);
-      })
-    .catch(err => console.log(err));
+  res.send(await utils.summarize(payload));
 });
 
 module.exports = router;
