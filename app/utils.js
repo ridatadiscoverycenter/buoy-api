@@ -1,7 +1,7 @@
 const aq = require('arquero');
 const op = aq.op;
 const buoys = require('@/routes/erddap/utils');
-const { getMultiBuoyGeoJsonData } = require('@/clients/erddap');
+const { getSingleBuoyGeoJsonData } = require('@/clients/erddap');
 
 aq.addFunction('sixhours', (x) => {
   if (x < 6) {
@@ -76,13 +76,20 @@ const downsample = (data, numPoints, variable) => {
 
 // summarize buoy data
 const summarize = async (payload) => {
-  return Promise.all(getMultiBuoyGeoJsonData(payload))
+  const payloads = payload.ids.map((id) => {
+    return {
+      id,
+      ...payload
+    }
+  });
+
+  return await Promise.all(payloads.map((p) => {
+    console.log(`getting summary for: ${p.id}`)
+    return getSingleBuoyGeoJsonData(p)
     .then(
-      (response) => {
-        const data = response.map((datum) => {
-          return datum.data?.features.map((feature) => {
+      (datum) => {
+        const data = datum.data?.features.map((feature) => {
             return feature.properties;
-          });
         });
 
         const rollupObject = {};
@@ -90,29 +97,36 @@ const summarize = async (payload) => {
           rollupObject[v] = op.valid(v);
         });
 
-        const processed = data.map((d) => {
-          let dt = aq.from(d)
-            .derive({
-              dt_ym: (d) =>
-                op.datetime(op.year(d.time), op.month(d.time)),
-              station_id: (d) => d.station_name
-            })
-            .groupby('station_id', 'dt_ym')
-            .rollup(rollupObject)
-            .objects();
-          return dt;
-        });
+        let dt = aq.from(data)
+          .derive({
+            dt_ym: (d) =>
+              op.datetime(op.year(d.time), op.month(d.time)),
+            station_id: (d) => d.station_name
+          })
+          .groupby('station_id', 'dt_ym')
+          .rollup(rollupObject)
+          .objects();
 
-        const final = processed
-          .reduce((a, b) => a.concat(b), [])
-          .map(d => {
-            d.station_name = buoys.stationMap[d.station_id];
-            return d;
-          });
-
-        return final;
+        return dt;
       })
-    .catch(err => err);
+    .catch(err => {
+      console.log(err);
+      return err;
+    });
+  })).then((summaries) => {
+    console.log("consolidating summaries...")
+    return summaries
+      .reduce((a, b) => a.concat(b), [])
+      .map(d => {
+        try {
+          d.station_name = buoys.stationMap[d.station_id];
+          return d;
+        } catch {
+          console.log(d);
+        }
+      });
+  })
+
 };
 
 module.exports = {
