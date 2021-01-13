@@ -20,6 +20,7 @@ const getMultiBuoyGeoJsonData = ({ ids, variable, start, end, datasetId }) => {
       .then((res) => res)
       .catch((err) => err);
   });
+  console.log('requested');
   return promiseArray;
 };
 

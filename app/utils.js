@@ -80,7 +80,6 @@ const summarize = async (payload) => {
     .then(
       (response) => {
         const data = response.map((datum) => {
-          console.log(datum);
           return datum.data?.features.map((feature) => {
             return feature.properties;
           });

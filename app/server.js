@@ -29,7 +29,6 @@ app.listen(port, () =>
   console.log(`Buoy Proxy API listening on port ${port}!`)
 );
 
-// initialize cache
 initialCache();
 
 app.use(function (_req, _res, next) {
