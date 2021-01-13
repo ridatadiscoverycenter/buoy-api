@@ -76,6 +76,8 @@ const downsample = (data, numPoints, variable) => {
 
 // summarize buoy data
 const summarize = async (payload) => {
+  console.time('summary');
+
   const payloads = payload.ids.map((id) => {
     return {
       id,
@@ -108,6 +110,8 @@ const summarize = async (payload) => {
 
     return results.concat(dt);
   }, [])
+
+  console.timeEnd('summary');
 
   return summaries.map(d => {
     d.station_name = buoys.stationMap[d.station_id];
