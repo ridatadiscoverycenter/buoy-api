@@ -83,49 +83,36 @@ const summarize = async (payload) => {
     }
   });
 
-  return await Promise.all(payloads.map((p) => {
+  const summaries = await payloads.reduce(async (res, p) => {
+    const results = await(res);
     console.log(`getting summary for: ${p.id}`)
-    return getSingleBuoyGeoJsonData(p)
-    .then(
-      (datum) => {
-        const data = datum.data?.features.map((feature) => {
-            return feature.properties;
-        });
-
-        const rollupObject = {};
-        buoys.variables.forEach(v => {
-          rollupObject[v] = op.valid(v);
-        });
-
-        let dt = aq.from(data)
-          .derive({
-            dt_ym: (d) =>
-              op.datetime(op.year(d.time), op.month(d.time)),
-            station_id: (d) => d.station_name
-          })
-          .groupby('station_id', 'dt_ym')
-          .rollup(rollupObject)
-          .objects();
-
-        return dt;
-      })
-    .catch(err => {
-      console.log(err);
-      return err;
+    const datum = await getSingleBuoyGeoJsonData(p);
+    const data = datum.data?.features.map((feature) => {
+        return feature.properties;
     });
-  })).then((summaries) => {
-    console.log("consolidating summaries...")
-    return summaries
-      .reduce((a, b) => a.concat(b), [])
-      .map(d => {
-        try {
-          d.station_name = buoys.stationMap[d.station_id];
-          return d;
-        } catch {
-          console.log(d);
-        }
-      });
-  })
+
+    const rollupObject = {};
+    buoys.variables.forEach(v => {
+      rollupObject[v] = op.valid(v);
+    });
+
+    let dt = aq.from(data)
+      .derive({
+        dt_ym: (d) =>
+          op.datetime(op.year(d.time), op.month(d.time)),
+        station_id: (d) => d.station_name
+      })
+      .groupby('station_id', 'dt_ym')
+      .rollup(rollupObject)
+      .objects();
+
+    return results.concat(dt);
+  }, [])
+
+  return summaries.map(d => {
+    d.station_name = buoys.stationMap[d.station_id];
+    return d;
+  });
 
 };
 
