@@ -25,10 +25,6 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 const erddapRouter = require('./routes/erddap/index');
 app.use('/erddap', erddapRouter);
 
-app.listen(port, () =>
-  console.log(`Buoy Proxy API listening on port ${port}!`)
-);
-
 // initialize cache and set timer to update it every day
 updateCache();
 setInterval(() => updateCache(), 86400000);
@@ -47,5 +43,9 @@ app.use(function (err, req, res, _next) {
   res.status(err.status || 500);
   res.json({ error: err });
 });
+
+app.listen(port, () =>
+  console.log(`Buoy Proxy API listening on port ${port}!`)
+);
 
 module.exports = app;
