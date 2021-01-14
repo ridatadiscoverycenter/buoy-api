@@ -6,7 +6,7 @@ const createError = require('http-errors');
 const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 const swaggerOptions = require('@/swaggerDef');
-const { initialCache } = require('@/init');
+const { updateCache } = require('@/init');
 
 const app = express();
 const port = 8080;
@@ -29,7 +29,9 @@ app.listen(port, () =>
   console.log(`Buoy Proxy API listening on port ${port}!`)
 );
 
-initialCache();
+// initialize cache and set timer to update it every day
+updateCache();
+setInterval(() => updateCache(), 86400000);
 
 app.use(function (_req, _res, next) {
   next(createError(404));
