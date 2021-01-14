@@ -28,7 +28,7 @@ const getSingleBuoyGeoJsonData = ({ id, variable, start, end, datasetId }) => {
     .then((res) => res)
     .catch((err) => {
       console.log(err);
-      return err
+      throw err
     });
 };
 

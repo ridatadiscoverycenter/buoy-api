@@ -88,7 +88,22 @@ const summarize = async (payload) => {
   const summaries = await payloads.reduce(async (res, p) => {
     const results = await(res);
     console.log(`getting summary for: ${p.id}`)
-    const datum = await getSingleBuoyGeoJsonData(p);
+    let datum;
+    let attempts = 0;
+    while (!datum && attempts < 5) {
+      try {
+        datum = await getSingleBuoyGeoJsonData(p);
+      } catch (err) {
+        console.log(err);
+        console.log("retrying")
+        attempts++;
+      }
+    }
+
+    if (!datum) {
+      throw `Cannot get buoy summary for ${p.id}`
+    }
+
     const data = datum.data?.features.map((feature) => {
         return feature.properties;
     });
