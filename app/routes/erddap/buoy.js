@@ -47,7 +47,7 @@ const { cacheMiddleware } = require('@/middleware/cache');
  *
  */
 
-// Ex:  http://localhost:3004/erddap/buoy/query?datasetId=combined_e784_bee5_492e&ids=bid2,bid3&variable=WaterTempSurface&start=2010-07-01T12:00:00Z&end=2010-07-05T12:00:00Z
+// Ex:  http://localhost:8080/erddap/buoy/query?datasetId=combined_e784_bee5_492e&ids=bid2,bid3&variable=WaterTempSurface&start=2010-07-01T12:00:00Z&end=2010-07-05T12:00:00Z
 
 router.get('/query', (req, res) => {
   const ids = req.query.ids.split(',');
@@ -102,7 +102,7 @@ router.get('/query', (req, res) => {
  *
  */
 
-// Ex:  http://localhost:3004/erddap/buoy/coordinates?ids=bid2,bid3
+// Ex:  http://localhost:8080/erddap/buoy/coordinates?ids=bid2,bid3
 
 router.get('/coordinates', (req, res) => {
   const ids = req.query.ids.split(',');
@@ -124,27 +124,21 @@ router.get('/coordinates', (req, res) => {
  * /erddap/buoy/summary:
  *   get:
  *     description: Get Buoy Coordinates from ERDDAP
- *     parameters:
- *      - name: end
- *        in: query
- *        description: End Date
- *        required: true
- *        type: string
  *     responses:
  *       200:
  *         description: Success! New content is now available.
  *
  */
 
-// Ex:  http://localhost:3004/erddap/buoy/summary?end=2010-07-05T12:00:00Z
+// Ex:  http://localhost:8080/erddap/buoy/summary
 
-router.get('/summary', cacheMiddleware, async (req, res) => { 
-  const end = req.query.end;
+router.get('/summary', cacheMiddleware, async (req, res) => {
+  const end = new Date().toISOString(); // now
   const ids = buoys.ids;
   const variable = buoys.variables.join(',');
   const payload = {
-    ids, 
-    variable, 
+    ids,
+    variable,
     datasetId: 'combined_e784_bee5_492e',
     start: '2000-07-01T12:00:00Z',
     end

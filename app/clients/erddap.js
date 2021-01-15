@@ -13,15 +13,23 @@ const getMultiBuoyGeoJsonData = ({ ids, variable, start, end, datasetId }) => {
   const startDate = start || '2003-01-01T12:00:00Z';
   const endDate = end || '2012-12-31T12:00:00Z';
   const promiseArray = ids.map((id) => {
-    return erddapClient
-      .get(
-        `/${datasetId}.geoJson?${variable},time,latitude,longitude,station_name&station_name="${id}"&time>=${startDate}&time<=${endDate}`
-      )
-      .then((res) => res)
-      .catch((err) => err);
+    return getSingleBuoyGeoJsonData({ id, variable, start, end, datasetId });
   });
-  console.log('requested');
   return promiseArray;
+};
+
+const getSingleBuoyGeoJsonData = ({ id, variable, start, end, datasetId }) => {
+  const startDate = start || '2003-01-01T12:00:00Z';
+  const endDate = end || '2012-12-31T12:00:00Z';
+  return erddapClient
+    .get(
+      `/${datasetId}.geoJson?${variable},time,latitude,longitude,station_name&station_name="${id}"&time>=${startDate}&time<=${endDate}`
+    )
+    .then((res) => res)
+    .catch((err) => {
+      console.log(err);
+      throw err
+    });
 };
 
 const getBuoysCoordinates = ({ ids }) => {
@@ -54,5 +62,6 @@ const getBuoysCoordinates = ({ ids }) => {
 
 module.exports = {
   getMultiBuoyGeoJsonData,
+  getSingleBuoyGeoJsonData,
   getBuoysCoordinates,
 };
