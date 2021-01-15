@@ -1,3 +1,7 @@
-const buoy = require('./buoy');
+const express = require('express');
+const router = express.Router();
 
-module.exports = [buoy];
+const buoyRouter = require('@/routes/erddap/buoy');
+router.use('/buoy', buoyRouter);
+
+module.exports = router;

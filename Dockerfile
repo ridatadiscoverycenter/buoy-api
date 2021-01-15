@@ -1,13 +1,16 @@
-FROM node:12-alpine
+FROM node:14-alpine
 
 RUN mkdir -p /usr/src/app
 
 WORKDIR /usr/src/app
 
-COPY . .
+COPY package.json .
+COPY yarn.lock .
 
 RUN npm install
 
-EXPOSE 3000
+COPY . .
+
+EXPOSE 8080
 
 CMD ["npm", "start"]
