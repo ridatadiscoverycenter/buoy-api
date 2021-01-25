@@ -1,9 +1,8 @@
-const aq = require('arquero');
+const aq = require("arquero");
 const op = aq.op;
-const { getSingleBuoyGeoJsonData } = require('@/clients/erddap');
+const { getSingleBuoyGeoJsonData } = require("@/clients/erddap");
 
-
-aq.addFunction('sixhours', (x) => {
+aq.addFunction("sixhours", (x) => {
   if (x < 6) {
     return 3;
   } else if (x < 12) {
@@ -16,6 +15,7 @@ aq.addFunction('sixhours', (x) => {
 });
 
 // downsample the buoy points to approximately the desired number of points
+// TODO: have this handle multiple buoys in one pass
 const downsample = (data, numPoints, variable) => {
   if (data.length <= numPoints) {
     return data;
@@ -33,12 +33,12 @@ const downsample = (data, numPoints, variable) => {
           op.hours(d.time)
         ),
     })
-    .groupby('station_name', 'dt_hr')
+    .groupby("station_name", "dt_hr")
     .rollup({ variable: op.mean(variable) });
 
   if (dt_hr.numRows() < numPoints) {
     return dt_hr
-      .select({ variable, station_name: 'station_name', dt_hr: 'time' })
+      .select({ variable, station_name: "station_name", dt_hr: "time" })
       .objects();
   }
 
@@ -53,12 +53,12 @@ const downsample = (data, numPoints, variable) => {
           op.sixhours(op.hours(d.time))
         ),
     })
-    .groupby('station_name', 'dt_qtr')
+    .groupby("station_name", "dt_qtr")
     .rollup({ variable: op.mean(variable) });
 
   if (dt_qtr.numRows() < numPoints) {
     return dt_qtr
-      .select({ variable, station_name: 'station_name', dt_qtr: 'time' })
+      .select({ variable, station_name: "station_name", dt_qtr: "time" })
       .objects();
   }
 
@@ -68,9 +68,9 @@ const downsample = (data, numPoints, variable) => {
       dt_day: (d) =>
         op.datetime(op.year(d.time), op.month(d.time), op.date(d.time)),
     })
-    .groupby('station_name', 'dt_day')
+    .groupby("station_name", "dt_day")
     .rollup({ variable: op.mean(variable) })
-    .select({ variable, station_name: 'station_name', dt_day: 'time' })
+    .select({ variable, station_name: "station_name", dt_day: "time" })
     .objects();
 };
 

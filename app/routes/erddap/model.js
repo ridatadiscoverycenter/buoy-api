@@ -1,10 +1,10 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const utils = require('@/utils');
-const common = require('@/routes/erddap/common');
-const { cacheMiddleware } = require('@/middleware/cache');
+const utils = require("@/utils");
+const common = require("@/routes/erddap/common");
+const { cacheMiddleware } = require("@/middleware/cache");
 
-const DATASET_ID = 'model_data_77bb_15c2_6ab3';
+const DATASET_ID = "model_data_77bb_15c2_6ab3";
 
 /**
  * @swagger
@@ -50,8 +50,8 @@ const DATASET_ID = 'model_data_77bb_15c2_6ab3';
 
 // Ex:  http://localhost:8080/erddap/model/query?datasetId=combined_e784_bee5_492e&ids=bid2,bid3&variable=WaterTempSurface&start=2010-07-01T12:00:00Z&end=2010-07-05T12:00:00Z
 
-router.get('/query', (req, res) => {
-  const ids = req.query.ids.split(',');
+router.get("/query", async (req, res) => {
+  const ids = req.query.ids.split(",");
   const datasetId = req.query.datasetId ?? DATASET_ID;
   const payload = {
     ids,
@@ -61,7 +61,8 @@ router.get('/query', (req, res) => {
     end: req.query.end,
   };
 
-  return common.queryErddapBuoys(payload, req.query.numPoints);
+  let data = await common.queryErddapBuoys(payload, req.query.numPoints);
+  res.send(data);
 });
 
 /**
@@ -78,7 +79,7 @@ router.get('/query', (req, res) => {
 
 // Ex:  http://localhost:8080/erddap/model/coordinates?ids=bid2,bid3
 
-router.get('/coordinates', async (req, res) => {
+router.get("/coordinates", async (req, res) => {
   const data = await common.getBuoyCoordinates(DATASET_ID);
   res.send(data);
 });
@@ -96,7 +97,7 @@ router.get('/coordinates', async (req, res) => {
 
 // Ex:  http://localhost:8080/erddap/model/summary
 
-router.get('/summary', cacheMiddleware, async (req, res) => {
+router.get("/summary", cacheMiddleware, async (req, res) => {
   res.send(await common.getSummary(DATASET_ID));
 });
 
