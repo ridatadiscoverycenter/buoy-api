@@ -9,21 +9,24 @@ const erddapClient = axios.create({
   },
 });
 
+const baseVariables = [
+  'time',
+  'latitude',
+  'longitude',
+  'station_name',
+]
+
 const getMultiBuoyGeoJsonData = ({ ids, variable, start, end, datasetId }) => {
-  const startDate = start || '2003-01-01T12:00:00Z';
-  const endDate = end || '2012-12-31T12:00:00Z';
-  const promiseArray = ids.map((id) => {
-    return getSingleBuoyGeoJsonData({ id, variable, start, end, datasetId });
-  });
-  return promiseArray;
+  const idString = `~"(${ids.join('|')})"`
+  return getSingleBuoyGeoJsonData({ idString, variable, start, end, datasetId });
 };
 
 const getSingleBuoyGeoJsonData = ({ id, variable, start, end, datasetId }) => {
-  const startDate = start || '2003-01-01T12:00:00Z';
-  const endDate = end || '2012-12-31T12:00:00Z';
+  const startDate = start ?? '2003-01-01T12:00:00Z';
+  const endDate = end ?? '2012-12-31T12:00:00Z';
   return erddapClient
     .get(
-      `/${datasetId}.geoJson?${variable},time,latitude,longitude,station_name&station_name="${id}"&time>=${startDate}&time<=${endDate}`
+      `/${datasetId}.geoJson?${variable},${baseVariables.join(',')}&station_name="${id}"&time>=${startDate}&time<=${endDate}`
     )
     .then((res) => res)
     .catch((err) => {
@@ -32,36 +35,45 @@ const getSingleBuoyGeoJsonData = ({ id, variable, start, end, datasetId }) => {
     });
 };
 
-const getBuoysCoordinates = ({ ids }) => {
-  const date = '2012-05-30T04:00:00.000Z';
-  const altDate4 = '2009-03-30T04:00:00.000Z';
-  const altDate16 = '2005-04-30T04:00:00.000Z';
+const getSummaryData = (datasetId, variables) => {
+  return erddapClient.get(
+    `/${datasetId}.json?${variables.join(',')},station_name,time&orderByCount("station_name,time/1month")`
+  )
+}
 
-  const promiseArray = ids.map((id) => {
-    let obj;
-    switch (id) {
-    case 'bid4':
-      obj = erddapClient.get(
-        `/combined_e784_bee5_492e.geoJson?latitude,longitude,station_name&station_name="${id}"&time>=${altDate4}&time<=${altDate4}`
-      );
-      break;
-    case 'bid16':
-      obj = erddapClient.get(
-        `/combined_e784_bee5_492e.geoJson?latitude,longitude,station_name&station_name="${id}"&time>=${altDate16}&time<=${altDate16}`
-      );
-      break;
-    default:
-      obj = erddapClient.get(
-        `/combined_e784_bee5_492e.geoJson?latitude,longitude,station_name&station_name="${id}"&time>=${date}&time<=${date}`
-      );
-    }
-    return obj;
-  });
-  return promiseArray;
+const getBuoysCoordinates = (datasetId) => {
+  return erddapClient.get(
+    `/${datasetId}.json?station_name,longitude,latitude&distinct()`
+  );
 };
+
+const getBuoyIds = async (datasetId) => {
+  const res = await erddapClient.get(`/${datasetId}.json?station_name&distinct()`)
+  return res.data.table.rows;
+}
+
+const getBuoyVariables = async (datasetId) => {
+  let vars = [];
+  const res = await erddapClient.get(`/${datasetId}.dds`)
+  const rows = res.data.split('\n').map((row) => {
+    let line = row.trim();
+    if (line.endsWith(';') && !line.includes('}')) {
+      let defn = line.substring(0, line.length - 1).split(" ")[1];
+      if (!baseVariables.includes(defn)) {
+        vars.push(defn);
+      }
+    }
+  });
+
+  return vars;
+}
+
 
 module.exports = {
   getMultiBuoyGeoJsonData,
   getSingleBuoyGeoJsonData,
   getBuoysCoordinates,
+  getBuoyIds,
+  getBuoyVariables,
+  getSummaryData,
 };

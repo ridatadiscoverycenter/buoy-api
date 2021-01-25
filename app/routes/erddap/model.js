@@ -4,11 +4,11 @@ const utils = require('@/utils');
 const common = require('@/routes/erddap/common');
 const { cacheMiddleware } = require('@/middleware/cache');
 
-const DATASET_ID = 'combined_e784_bee5_492e';
+const DATASET_ID = 'model_data_77bb_15c2_6ab3';
 
 /**
  * @swagger
- * /erddap/buoy/query:
+ * /erddap/model/query:
  *   get:
  *     description: Get Data from ERDDAP
  *     parameters:
@@ -48,7 +48,7 @@ const DATASET_ID = 'combined_e784_bee5_492e';
  *
  */
 
-// Ex:  http://localhost:8080/erddap/buoy/query?datasetId=combined_e784_bee5_492e&ids=bid2,bid3&variable=WaterTempSurface&start=2010-07-01T12:00:00Z&end=2010-07-05T12:00:00Z
+// Ex:  http://localhost:8080/erddap/model/query?datasetId=combined_e784_bee5_492e&ids=bid2,bid3&variable=WaterTempSurface&start=2010-07-01T12:00:00Z&end=2010-07-05T12:00:00Z
 
 router.get('/query', (req, res) => {
   const ids = req.query.ids.split(',');
@@ -66,7 +66,7 @@ router.get('/query', (req, res) => {
 
 /**
  * @swagger
- * /erddap/buoy/coordinates:
+ * /erddap/model/coordinates:
  *   get:
  *     description: Get Buoy Coordinates from ERDDAP
  *     parameters:
@@ -76,7 +76,7 @@ router.get('/query', (req, res) => {
  *
  */
 
-// Ex:  http://localhost:8080/erddap/buoy/coordinates?ids=bid2,bid3
+// Ex:  http://localhost:8080/erddap/model/coordinates?ids=bid2,bid3
 
 router.get('/coordinates', async (req, res) => {
   const data = await common.getBuoyCoordinates(DATASET_ID);
@@ -85,7 +85,7 @@ router.get('/coordinates', async (req, res) => {
 
 /**
  * @swagger
- * /erddap/buoy/summary:
+ * /erddap/model/summary:
  *   get:
  *     description: Get Buoy Coordinates from ERDDAP
  *     responses:
@@ -94,7 +94,7 @@ router.get('/coordinates', async (req, res) => {
  *
  */
 
-// Ex:  http://localhost:8080/erddap/buoy/summary
+// Ex:  http://localhost:8080/erddap/model/summary
 
 router.get('/summary', cacheMiddleware, async (req, res) => {
   res.send(await common.getSummary(DATASET_ID));
