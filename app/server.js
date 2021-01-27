@@ -41,11 +41,9 @@ app.use(function (err, req, res, _next) {
 
   // render the error page
   res.status(err.status || 500);
-  res.json({ error: err });
+  res.json({ error: err.message });
 });
 
-app.listen(port, () =>
-  console.log(`Buoy Proxy API listening on port ${port}!`)
-);
+app.listen(port, () => console.log(`RIDDC API listening on port ${port}!`));
 
 module.exports = app;

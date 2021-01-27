@@ -7,6 +7,11 @@ const {
 } = require("@/clients/erddap");
 const utils = require("@/utils");
 
+const datasetMap = {
+  buoy: "combined_e784_bee5_492e",
+  model: "model_data_77bb_15c2_6ab3",
+};
+
 const stationMap = {
   bid2: "N. Prudence",
   bid3: "Conimicut Pt",
@@ -28,8 +33,6 @@ const queryErddapBuoys = async (payload, rawNumPoints) => {
   const numPoints = rawNumPoints ?? 1000;
 
   const res = await getMultiBuoyGeoJsonData(payload);
-
-  console.log(res.data);
 
   let processed = res.data.features.map((feature) => {
     const date = new Date(feature.properties.time);
@@ -74,4 +77,5 @@ module.exports = {
   getBuoyCoordinates,
   getSummary,
   stationMap,
+  datasetMap,
 };

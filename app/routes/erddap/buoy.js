@@ -4,19 +4,22 @@ const utils = require("@/utils");
 const common = require("@/routes/erddap/common");
 const { cacheMiddleware } = require("@/middleware/cache");
 
-const DATASET_ID = "combined_e784_bee5_492e";
+router.param("source", (req, res, next, source) => {
+  req.datasetId = common.datasetMap[source];
+
+  if (req.datasetId) {
+    next();
+  } else {
+    next(new Error("unknown erddap source, only buoy or model allowed"));
+  }
+});
 
 /**
  * @swagger
- * /erddap/buoy/query:
+ * /erddap/:source/query:
  *   get:
  *     description: Get Data from ERDDAP
  *     parameters:
- *      - name: datasetId
- *        in: query
- *        description: Dataset ID in ERDDAP.
- *        required: true
- *        type: string
  *      - name: ids
  *        in: query
  *        description: Buoy IDs, comma separated
@@ -50,12 +53,11 @@ const DATASET_ID = "combined_e784_bee5_492e";
 
 // Ex:  http://localhost:8080/erddap/buoy/query?datasetId=combined_e784_bee5_492e&ids=bid2,bid3&variable=WaterTempSurface&start=2010-07-01T12:00:00Z&end=2010-07-05T12:00:00Z
 
-router.get("/query", async (req, res) => {
+router.get("/:source/query", async (req, res) => {
   const ids = req.query.ids.split(",");
-  const datasetId = req.query.datasetId ?? DATASET_ID;
   const payload = {
     ids,
-    datasetId,
+    datasetId: req.datasetId,
     variable: req.query.variable,
     start: req.query.start,
     end: req.query.end,
@@ -67,7 +69,7 @@ router.get("/query", async (req, res) => {
 
 /**
  * @swagger
- * /erddap/buoy/coordinates:
+ * /erddap/:source/coordinates:
  *   get:
  *     description: Get Buoy Coordinates from ERDDAP
  *     parameters:
@@ -79,14 +81,14 @@ router.get("/query", async (req, res) => {
 
 // Ex:  http://localhost:8080/erddap/buoy/coordinates?ids=bid2,bid3
 
-router.get("/coordinates", async (req, res) => {
-  const data = await common.getBuoyCoordinates(DATASET_ID);
+router.get("/:source/coordinates", async (req, res) => {
+  const data = await common.getBuoyCoordinates(req.datasetId);
   res.send(data);
 });
 
 /**
  * @swagger
- * /erddap/buoy/summary:
+ * /erddap/:source/summary:
  *   get:
  *     description: Get Buoy Coordinates from ERDDAP
  *     responses:
@@ -97,8 +99,8 @@ router.get("/coordinates", async (req, res) => {
 
 // Ex:  http://localhost:8080/erddap/buoy/summary
 
-router.get("/summary", cacheMiddleware, async (req, res) => {
-  res.send(await common.getSummary(DATASET_ID));
+router.get("/:source/summary", cacheMiddleware, async (req, res) => {
+  res.send(await common.getSummary(req.datasetId));
 });
 
 module.exports = router;
