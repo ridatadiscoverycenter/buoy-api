@@ -103,4 +103,21 @@ router.get("/:source/summary", cacheMiddleware, async (req, res) => {
   res.send(await common.getSummary(req.datasetId));
 });
 
+/**
+ * @swagger
+ * /erddap/:source/variables:
+ *   get:
+ *     description: Get Variables available for this source dataset
+ *     responses:
+ *       200:
+ *         description: Success! New content is now available.
+ *
+ */
+
+// Ex:  http://localhost:8080/erddap/buoy/summary
+
+router.get("/:source/variables", async (req, res) => {
+  res.send(await common.getVariables(req.datasetId));
+});
+
 module.exports = router;

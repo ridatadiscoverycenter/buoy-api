@@ -32,7 +32,13 @@ const stationMap = {
 const queryErddapBuoys = async (payload, rawNumPoints) => {
   const numPoints = rawNumPoints ?? 1000;
 
-  const res = await getMultiBuoyGeoJsonData(payload);
+  let res;
+  try {
+    res = await getMultiBuoyGeoJsonData(payload);
+  } catch (e) {
+    console.log(e);
+    return [];
+  }
 
   let processed = res.data.features.map((feature) => {
     const date = new Date(feature.properties.time);
@@ -72,10 +78,15 @@ const getSummary = async (datasetId) => {
   });
 };
 
+const getVariables = (datasetId) => {
+  return getBuoyVariables(datasetId);
+};
+
 module.exports = {
   queryErddapBuoys,
   getBuoyCoordinates,
   getSummary,
+  getVariables,
   stationMap,
   datasetMap,
 };
