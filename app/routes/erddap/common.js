@@ -79,7 +79,7 @@ const getSummary = async (datasetId) => {
 };
 
 const getVariables = (datasetId) => {
-  return getBuoyVariables(datasetId);
+  return getBuoyVariables(datasetId).then((res) => res.sort());
 };
 
 module.exports = {

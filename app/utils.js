@@ -2,7 +2,7 @@ const aq = require("arquero");
 const op = aq.op;
 const { getSingleBuoyGeoJsonData } = require("@/clients/erddap");
 
-aq.addFunction("sixhours", (x) => {
+aq.addFunction("utcsixhours", (x) => {
   if (x < 6) {
     return 3;
   } else if (x < 12) {
