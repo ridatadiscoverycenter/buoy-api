@@ -11,6 +11,10 @@ const datasetMap = {
   buoy: "combined_e784_bee5_492e",
   model: "model_data_77bb_15c2_6ab3",
 };
+const summaryUnitMap = {
+  buoy: "month",
+  model: "year",
+};
 
 const stationMap = {
   bid2: "N. Prudence",
@@ -67,9 +71,14 @@ const getBuoyCoordinates = async (datasetId) => {
   });
 };
 
-const getSummary = async (datasetId) => {
+const getSummary = async (source) => {
+  const datasetId = datasetMap[source];
   const variables = await getBuoyVariables(datasetId);
-  const res = await getSummaryData(datasetId, variables);
+  const res = await getSummaryData(
+    datasetId,
+    variables,
+    summaryUnitMap[source]
+  );
   const data = res.data.table;
   return data.rows.map((row) => {
     let res = {};
@@ -89,4 +98,5 @@ module.exports = {
   getVariables,
   stationMap,
   datasetMap,
+  summaryUnitMap,
 };

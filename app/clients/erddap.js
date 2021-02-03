@@ -46,11 +46,11 @@ const getSingleBuoyGeoJsonData = ({
     });
 };
 
-const getSummaryData = (datasetId, variables) => {
+const getSummaryData = (datasetId, variables, timeUnit) => {
   return erddapClient.get(
     `/${datasetId}.json?${variables.join(
       ","
-    )},station_name,time&orderByCount("station_name,time/1month")`
+    )},station_name,time&orderByCount("station_name,time/${timeUnit}")`
   );
 };
 

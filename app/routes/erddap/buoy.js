@@ -6,6 +6,7 @@ const { cacheMiddleware } = require("@/middleware/cache");
 
 router.param("source", (req, res, next, source) => {
   req.datasetId = common.datasetMap[source];
+  req.source = source;
 
   if (req.datasetId) {
     next();
