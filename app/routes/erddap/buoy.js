@@ -82,7 +82,7 @@ router.get("/:source/query", async (req, res) => {
 
 // Ex:  http://localhost:8080/erddap/buoy/coordinates?ids=bid2,bid3
 
-router.get("/:source/coordinates", async (req, res) => {
+router.get("/:source/coordinates", cacheMiddleware, async (req, res) => {
   const data = await common.getBuoyCoordinates(req.datasetId);
   res.send(data);
 });
@@ -101,7 +101,7 @@ router.get("/:source/coordinates", async (req, res) => {
 // Ex:  http://localhost:8080/erddap/buoy/summary
 
 router.get("/:source/summary", cacheMiddleware, async (req, res) => {
-  res.send(await common.getSummary(req.datasetId));
+  res.send(await common.getSummary(req.params.source));
 });
 
 /**
@@ -117,7 +117,7 @@ router.get("/:source/summary", cacheMiddleware, async (req, res) => {
 
 // Ex:  http://localhost:8080/erddap/buoy/summary
 
-router.get("/:source/variables", async (req, res) => {
+router.get("/:source/variables", cacheMiddleware, async (req, res) => {
   res.send(await common.getVariables(req.datasetId));
 });
 
