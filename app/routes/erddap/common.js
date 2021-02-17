@@ -26,9 +26,9 @@ const stationMap = {
   bid8: "Mnt. Hope Bay",
   bid9: "Poppasquash Pt",
   bid10: "Sally Rock",
-  bid13: "Unknown",
+  bid13: "Phillipsdale",
   bid15: "Greenwich Bay",
-  bid16: "Unknown",
+  bid16: "Potters Cove",
   bid17: "GSO Dock",
   bid21: "Station II",
 };
@@ -83,6 +83,8 @@ const getSummary = async (source) => {
   return data.rows.map((row) => {
     let res = {};
     for (const [i, key] of data.columnNames.entries()) res[key] = row[i];
+    res.buoyId = res.station_name;
+    res.station_name = `${stationMap[res.buoyId]} (${res.buoyId})`;
     return res;
   });
 };
