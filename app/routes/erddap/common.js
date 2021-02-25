@@ -10,10 +10,12 @@ const utils = require("@/utils");
 const datasetMap = {
   buoy: "combined_e784_bee5_492e",
   model: "model_data_77bb_15c2_6ab3",
+  plankton: "plankton_time_series_7615_c513_ef8e",
 };
 const summaryUnitMap = {
   buoy: "month",
   model: "year",
+  plankton: "month",
 };
 
 const stationMap = {
@@ -40,7 +42,8 @@ const queryErddapBuoys = async (payload, rawNumPoints) => {
   try {
     res = await getMultiBuoyGeoJsonData(payload);
   } catch (e) {
-    console.log(e);
+    console.log(e.config.url);
+    console.log(e.response.data);
     return [];
   }
 
@@ -52,10 +55,7 @@ const queryErddapBuoys = async (payload, rawNumPoints) => {
     return feature.properties;
   });
 
-  // TODO: to filter or not to filter?
-  // let filtered = processed.filter((arr) => arr[variable] !== null);
-
-  return utils.downsample(processed, numPoints, payload.variable);
+  return utils.downsample(processed, numPoints, payload.variables);
 };
 
 const getBuoyCoordinates = async (datasetId) => {

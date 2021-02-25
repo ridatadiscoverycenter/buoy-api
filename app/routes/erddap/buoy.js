@@ -11,7 +11,9 @@ router.param("source", (req, res, next, source) => {
   if (req.datasetId) {
     next();
   } else {
-    next(new Error("unknown erddap source, only buoy or model allowed"));
+    next(
+      new Error("unknown erddap source, only buoy, model or plankton allowed")
+    );
   }
 });
 
@@ -26,9 +28,9 @@ router.param("source", (req, res, next, source) => {
  *        description: Buoy IDs, comma separated
  *        required: true
  *        type: string
- *      - name: variable
+ *      - name: variables
  *        in: query
- *        description: Measurement Variable
+ *        description: Measurement Variables, comma separated
  *        required: true
  *        type: string
  *      - name: start
@@ -52,14 +54,15 @@ router.param("source", (req, res, next, source) => {
  *
  */
 
-// Ex:  http://localhost:8080/erddap/buoy/query?datasetId=combined_e784_bee5_492e&ids=bid2,bid3&variable=WaterTempSurface&start=2010-07-01T12:00:00Z&end=2010-07-05T12:00:00Z
+// Ex:  http://localhost:8080/erddap/buoy/query?ids=bid2,bid3&variable=WaterTempSurface&start=2010-07-01T12:00:00Z&end=2010-07-05T12:00:00Z
 
 router.get("/:source/query", async (req, res) => {
   const ids = req.query.ids.split(",");
+  const variables = req.query.variables.split(",");
   const payload = {
     ids,
     datasetId: req.datasetId,
-    variable: req.query.variable,
+    variables,
     start: req.query.start,
     end: req.query.end,
   };
