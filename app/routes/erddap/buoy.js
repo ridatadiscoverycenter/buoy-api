@@ -3,6 +3,7 @@ const router = express.Router();
 const utils = require("@/utils");
 const common = require("@/routes/erddap/common");
 const { cacheMiddleware } = require("@/middleware/cache");
+const mcache = require("memory-cache");
 
 router.param("source", (req, res, next, source) => {
   req.datasetId = common.datasetMap[source];
@@ -58,7 +59,14 @@ router.param("source", (req, res, next, source) => {
 
 router.get("/:source/query", async (req, res) => {
   const ids = req.query.ids.split(",");
-  const variables = req.query.variables.split(",");
+
+  // check variables queried exist for this dataset, short circuit if they don't
+  const queryVariables = req.query.variables.split(",");
+  const datasetVariables =
+    mcache.get(`__express__/erddap/${req.params.source}/variables`) ?? [];
+  const variables = queryVariables.filter((v) => datasetVariables.includes(v));
+  if (variables.length === 0) res.send([]);
+
   const payload = {
     ids,
     datasetId: req.datasetId,
