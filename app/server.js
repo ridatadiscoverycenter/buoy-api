@@ -26,8 +26,9 @@ const erddapRouter = require("./routes/erddap/index");
 app.use("/erddap", erddapRouter);
 
 // initialize cache and set timer to update it every day
-updateCache();
-setInterval(() => updateCache(), 86400000);
+const cacheTimeout = 60 * 60 * 24 * 1000; // one day of milliseconds
+updateCache(cacheTimeout);
+setInterval(() => updateCache(cacheTimeout), cacheTimeout);
 
 app.use(function (_req, _res, next) {
   next(createError(404));

@@ -11,11 +11,11 @@ const erddapClient = axios.create({
 
 const baseVariables = ["time", "latitude", "longitude", "station_name"];
 
-const getMultiBuoyGeoJsonData = ({ ids, variable, start, end, datasetId }) => {
+const getMultiBuoyGeoJsonData = ({ ids, variables, start, end, datasetId }) => {
   const idString = `~"(${ids.join("|")})"`;
   return getSingleBuoyGeoJsonData({
     idString,
-    variable,
+    variables,
     start,
     end,
     datasetId,
@@ -25,7 +25,7 @@ const getMultiBuoyGeoJsonData = ({ ids, variable, start, end, datasetId }) => {
 const getSingleBuoyGeoJsonData = ({
   id,
   idString,
-  variable,
+  variables,
   start,
   end,
   datasetId,
@@ -35,13 +35,12 @@ const getSingleBuoyGeoJsonData = ({
   idString = idString ?? `"${id}"`;
   return erddapClient
     .get(
-      `/${datasetId}.geoJson?${variable},${baseVariables.join(
+      `/${datasetId}.geoJson?${variables.join(",")},${baseVariables.join(
         ","
       )}&station_name=${idString}&time>=${startDate}&time<=${endDate}`
     )
     .then((res) => res)
     .catch((err) => {
-      console.log(err);
       throw err;
     });
 };
