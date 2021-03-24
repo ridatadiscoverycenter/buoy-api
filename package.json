@@ -8,6 +8,7 @@
   "scripts": {
     "start": "node app/server.js",
     "dev": "nodemon app/server.js",
+    "dev:local": "BUOY_API_ERDDAP_URL=http://localhost:8080/erddap/tabledap nodemon app/server.js",
     "test": "mocha",
     "jsdoc": "jsdoc app/server.js",
     "swagger": "swagger-jsdoc -d app/swaggerDef.js app/routes/content.js",

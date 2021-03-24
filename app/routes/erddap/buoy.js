@@ -6,10 +6,11 @@ const { cacheMiddleware } = require("@/middleware/cache");
 const mcache = require("memory-cache");
 
 router.param("source", (req, res, next, source) => {
+  const skip_sources = ["da"];
   req.datasetId = common.datasetMap[source];
   req.source = source;
 
-  if (req.datasetId) {
+  if (req.datasetId || skip_sources.includes(source)) {
     next();
   } else {
     next(

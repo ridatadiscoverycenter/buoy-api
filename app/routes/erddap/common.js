@@ -1,7 +1,6 @@
 const {
   getMultiBuoyGeoJsonData,
   getBuoysCoordinates,
-  getBuoyIds,
   getBuoyVariables,
   getSummaryData,
 } = require("@/clients/erddap");
@@ -60,14 +59,10 @@ const queryErddapBuoys = async (payload, rawNumPoints) => {
 
 const getBuoyCoordinates = async (datasetId) => {
   const response = await getBuoysCoordinates(datasetId);
-  const rows = response.data.table.rows;
-  return rows.map((buoy) => {
-    return {
-      latitude: buoy[2],
-      longitude: buoy[1],
-      buoyId: buoy[0],
-      station_name: stationMap[buoy[0]],
-    };
+  return response.map((buoy) => {
+    buoy.buoyId = buoy.station_name;
+    buoy.station_name = stationMap[buoy.buoyId];
+    return buoy;
   });
 };
 
@@ -79,18 +74,16 @@ const getSummary = async (source) => {
     variables,
     summaryUnitMap[source]
   );
-  const data = res.data.table;
-  return data.rows.map((row) => {
-    let res = {};
-    for (const [i, key] of data.columnNames.entries()) res[key] = row[i];
-    res.buoyId = res.station_name;
-    res.station_name = `${stationMap[res.buoyId]} (${res.buoyId})`;
-    return res;
+  return res.map((row) => {
+    row.buoyId = row.station_name;
+    row.station_name = `${stationMap[row.buoyId]} (${row.buoyId})`;
+    return row;
   });
 };
 
-const getVariables = (datasetId) => {
-  return getBuoyVariables(datasetId).then((res) => res.sort());
+const getVariables = async (datasetId) => {
+  let vars = await getBuoyVariables(datasetId);
+  return vars.sort();
 };
 
 module.exports = {

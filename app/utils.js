@@ -1,6 +1,5 @@
 const aq = require("arquero");
 const op = aq.op;
-const { getSingleBuoyGeoJsonData } = require("@/clients/erddap");
 
 aq.addFunction("utcsixhours", (x) => {
   if (x < 6) {
@@ -114,6 +113,15 @@ const downsample = (data, numPoints, variables) => {
   return dsets.reduce((acc, val) => acc.concat(val), []);
 };
 
+const jsonTableToObjects = (table) => {
+  return table.rows.map((row) => {
+    let res = {};
+    for (const [i, key] of table.columnNames.entries()) res[key] = row[i];
+    return res;
+  });
+};
+
 module.exports = {
   downsample,
+  jsonTableToObjects,
 };

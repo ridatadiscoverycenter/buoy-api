@@ -9,7 +9,7 @@ const swaggerOptions = require("@/swaggerDef");
 const { updateCache } = require("@/init");
 
 const app = express();
-const port = 8080;
+const port = 8088;
 
 const specs = swaggerJsdoc(swaggerOptions);
 
@@ -28,7 +28,8 @@ app.use("/erddap", erddapRouter);
 // initialize cache and set timer to update it every day
 const cacheTimeout = 60 * 60 * 24 * 1000; // one day of milliseconds
 updateCache(cacheTimeout);
-setInterval(() => updateCache(cacheTimeout), cacheTimeout);
+// start refreshing 10 seconds before timeout
+setInterval(() => updateCache(cacheTimeout), cacheTimeout - 10000);
 
 app.use(function (_req, _res, next) {
   next(createError(404));
