@@ -70,7 +70,7 @@ router.get("/coordinates", cacheMiddleware, async (req, res) => {
  *
  */
 router.get("/samples", cacheMiddleware, async (req, res) => {
-  const coordinates = mcache.get(`__express__/erddap/da/coordinates`) ?? [];
+  const coordinates = mcache.get(`__express__/erddap/da/coordinates`) ?? await getCoordinates();
   let data = await getSamples(coordinates);
   res.send(data);
 });

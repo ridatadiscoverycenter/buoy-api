@@ -1,7 +1,0 @@
-version: '3'
-services:
-  api:
-    image: riddc-api
-    build: .
-    ports:
-      - "8080:8080"
