@@ -88,6 +88,11 @@ const getDAData = async ({ sites, datasetId }) => {
   return utils.jsonTableToObjects(res.data.table);
 };
 
+const getFishData = async () => {
+  // TODO: get fish data from erddap, minimal processing here
+  return []
+};
+
 module.exports = {
   getMultiBuoyGeoJsonData,
   getSingleBuoyGeoJsonData,
@@ -95,4 +100,5 @@ module.exports = {
   getBuoyVariables,
   getSummaryData,
   getDAData,
+  getFishData
 };

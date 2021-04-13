@@ -2,9 +2,15 @@
 
 Simple Node-Express API to fetch and process data from ERDDAP.
 
+To install:
+`yarn`
+
 To run:
 `yarn start`
-`yarn dev`
+`yarn dev` (if trying to connect to a local erddap instance, use `yarn dev:local` instead)
+
+Linting:
+`yarn prettify`
 
 Listening on:
 `localhost:8088`

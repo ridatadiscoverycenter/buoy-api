@@ -1,6 +1,7 @@
 const utils = require("@/utils");
 const common = require("@/routes/erddap/common");
 const da = require("@/routes/erddap/da");
+const fish = require("@/routes/erddap/fish");
 const mcache = require("memory-cache");
 
 const updateCache = async (timeout) => {
@@ -16,10 +17,16 @@ const updateCache = async (timeout) => {
     console.log(`cache for ${src} complete`);
   });
 
-  const coordinates = await da.getCoordinates();
-  mcache.put(`${keyBase}/da/coordinates`, coordinates, timeout);
-  const samples = await da.getSamples(coordinates);
-  mcache.put(`${keyBase}/da/samples`, samples, timeout);
+  const daCoordinates = await da.getCoordinates();
+  mcache.put(`${keyBase}/da/coordinates`, daCoordinates, timeout);
+  const daSamples = await da.getSamples(daCoordinates);
+  mcache.put(`${keyBase}/da/samples`, daSamples, timeout);
+
+  // TODO: review if this initialization of the cache is correct
+  const fishCoordinates = await da.getCoordinates();
+  mcache.put(`${keyBase}/fish/coordinates`, fishCoordinates, timeout);
+  const fishSamples = await da.getSamples();
+  mcache.put(`${keyBase}/fish/samples`, fishSamples, timeout);
 };
 
 module.exports = {
