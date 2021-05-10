@@ -20,6 +20,7 @@ const updateCache = async (timeout) => {
   mcache.put(`${keyBase}/da/coordinates`, coordinates, timeout);
   const samples = await da.getSamples(coordinates);
   mcache.put(`${keyBase}/da/samples`, samples, timeout);
+  console.log(`cache for da complete`);
 };
 
 module.exports = {
