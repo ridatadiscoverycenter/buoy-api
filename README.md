@@ -7,7 +7,7 @@ To run:
 `yarn dev`
 
 Listening on:
-`localhost:8080`
+`localhost:8088`
 
 Documentation:
-`localhost:8080/api-docs`
+`localhost:8088/api-docs`

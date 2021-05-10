@@ -1,7 +1,10 @@
 const axios = require("axios");
+const utils = require("@/utils");
 
 const erddapClient = axios.create({
-  baseURL: "https://pricaimcit.services.brown.edu/erddap/tabledap",
+  baseURL:
+    process.env.BUOY_API_ERDDAP_URL ??
+    "https://pricaimcit.services.brown.edu/erddap/tabledap",
   withCredentials: false,
   headers: {
     Accept: "application/json",
@@ -45,25 +48,20 @@ const getSingleBuoyGeoJsonData = ({
     });
 };
 
-const getSummaryData = (datasetId, variables, timeUnit) => {
-  return erddapClient.get(
+const getSummaryData = async (datasetId, variables, timeUnit) => {
+  const res = await erddapClient.get(
     `/${datasetId}.json?${variables.join(
       ","
     )},station_name,time&orderByCount("station_name,time/${timeUnit}")`
   );
+  return utils.jsonTableToObjects(res.data.table);
 };
 
-const getBuoysCoordinates = (datasetId) => {
-  return erddapClient.get(
+const getBuoysCoordinates = async (datasetId) => {
+  const res = await erddapClient.get(
     `/${datasetId}.json?station_name,longitude,latitude&distinct()`
   );
-};
-
-const getBuoyIds = async (datasetId) => {
-  const res = await erddapClient.get(
-    `/${datasetId}.json?station_name&distinct()`
-  );
-  return res.data.table.rows;
+  return utils.jsonTableToObjects(res.data.table);
 };
 
 const getBuoyVariables = async (datasetId) => {
@@ -82,11 +80,19 @@ const getBuoyVariables = async (datasetId) => {
   return vars;
 };
 
+const getDAData = async ({ sites, datasetId }) => {
+  const siteString = `~"(${sites.join("|")})"`;
+  const res = await erddapClient.get(
+    `/${datasetId}.json?time,Site,pDA_ng_Lseawater_1ngL_LOQ&Site=${siteString}`
+  );
+  return utils.jsonTableToObjects(res.data.table);
+};
+
 module.exports = {
   getMultiBuoyGeoJsonData,
   getSingleBuoyGeoJsonData,
   getBuoysCoordinates,
-  getBuoyIds,
   getBuoyVariables,
   getSummaryData,
+  getDAData,
 };
