@@ -26,9 +26,9 @@
     "prettier": "^2.2.1"
   },
   "dependencies": {
-    "arquero": "^2.2.0",
+    "arquero": "4",
     "axios": "^0.21.1",
-    "dotenv": "^8.2.0",
+    "dotenv": "9",
     "express": "^4.17.1",
     "http-errors": "^1.8.0",
     "lodash": "^4.17.20",
