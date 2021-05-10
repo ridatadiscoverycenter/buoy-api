@@ -17,15 +17,15 @@ const updateCache = async (timeout) => {
     console.log(`cache for ${src} complete`);
   });
 
-  const daCoordinates = await da.getCoordinates();
-  mcache.put(`${keyBase}/da/coordinates`, daCoordinates, timeout);
-  const daSamples = await da.getSamples(daCoordinates);
-  mcache.put(`${keyBase}/da/samples`, daSamples, timeout);
+  // const daCoordinates = await da.getCoordinates();
+  // mcache.put(`${keyBase}/da/coordinates`, daCoordinates, timeout);
+  // const daSamples = await da.getSamples(daCoordinates);
+  // mcache.put(`${keyBase}/da/samples`, daSamples, timeout);
 
   // TODO: review if this initialization of the cache is correct
-  const fishCoordinates = await da.getCoordinates();
+  const fishCoordinates = await fish.getCoordinates();
   mcache.put(`${keyBase}/fish/coordinates`, fishCoordinates, timeout);
-  const fishSamples = await da.getSamples();
+  const fishSamples = await fish.getSpecies(fishCoordinates);
   mcache.put(`${keyBase}/fish/samples`, fishSamples, timeout);
 };
 
