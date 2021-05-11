@@ -24,23 +24,23 @@ const getCoordinates = async () => {
 const getSpecies = async (coordinates) => {
   const sites = coordinates.map((row) => row.station_name);
   const rawData = await getFishData({ sites, datasetId: CATCH_DATASET_ID});
-  return rawData
+  let fox_i = aq.from(rawData).filter((d) => d.Station == "Fox Island");
+  let whale_r = aq.from(rawData).filter((d) => d.Station == "Whale Rock");
 
-  // TODO: fill this in - for fish by year and location, think about data format/any 
-  // calculated fields that might be needed, use arquero as needed to reshape data, 
-  // also maybe if it makes sense to get all data at once or we need to have query variables
-  // also whether to include the temp and other data here, or have that be a separate route/query
+  return {"Fox Island": fox_i.objects(), "Whale Rock": whale_r.objects() }
+
+ 
 };
 
-// const getMetrics = async (coordinates) => {
-//   const sites = coordinates.map((row) => row.station_name);
-//   const rawData_temp = await getDAData({ sites, datasetId: TEMP_DATASET_ID});
-//   const rawData_etc = await getDAData({ sites, datasetId: YSI_DATASET_ID});
-//   // TODO: fill this in - for fish by year and location, think about data format/any 
-//   // calculated fields that might be needed, use arquero as needed to reshape data, 
-//   // also maybe if it makes sense to get all data at once or we need to have query variables
-//   // also whether to include the temp and other data here, or have that be a separate route/query
-// };
+const getMetrics = async (coordinates) => {
+  const sites = coordinates.map((row) => row.station_name);
+  const rawData_temp = await getFishData({ sites, datasetId: TEMP_DATASET_ID});
+  const rawData_etc = await getFishData({ sites, datasetId: YSI_DATASET_ID});
+  const temp_table = aq.from(rawData_temp)
+  const etc_table = aq.from(rawData_etc)
+  const join = temp_table.join_full(etc_table)
+  return join.objects()
+};
 
 // ROUTES
 
@@ -88,13 +88,15 @@ router.get("/samples", cacheMiddleware, async (req, res) => {
  *         description: Success! New content is now available.
  *
  */
-// router.get("/metrics", cacheMiddleware, async (req, res) => {
-//   const result = await getCoordinates();
-//   res.send(result);
-// });
+router.get("/metrics", cacheMiddleware, async (req, res) => {
+  const coordinates = mcache.get(`__express__/erddap/fish/coordinates`)
+  const result = await getMetrics(coordinates);
+  res.send(result);
+});
 
 module.exports = {
   getCoordinates,
   getSpecies,
+  getMetrics,
   router,
 };

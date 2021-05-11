@@ -27,6 +27,8 @@ const updateCache = async (timeout) => {
   mcache.put(`${keyBase}/fish/coordinates`, fishCoordinates, timeout);
   const fishSamples = await fish.getSpecies(fishCoordinates);
   mcache.put(`${keyBase}/fish/samples`, fishSamples, timeout);
+  const fishMetrics = await fish.getMetrics(fishCoordinates);
+  mcache.put(`${keyBase}/fish/metrics`, fishMetrics, timeout);
 };
 
 module.exports = {
