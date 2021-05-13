@@ -32,29 +32,48 @@ const getSpecies = async (coordinates) => {
  
 };
 
-const getMetrics = async (coordinates) => {
+const getTemps = async(coordinates) => {
   const sites = coordinates.map((row) => row.station_name);
   const rawData_temp = await getFishData({ sites, datasetId: TEMP_DATASET_ID});
-  const rawData_etc = await getFishData({ sites, datasetId: YSI_DATASET_ID});
-  var i;
-  let temp_table = {"Fox Island":[], "Whale Rock": [] }
-  for (i = 1959; i < 2018; i++){
-    let year_i = i.toString()
-    let dt_fi = aq.from(rawData_temp).params({year: year_i}).filter((d,$) => (op.includes(d.time, $.year) && d.Station == "Fox Island"))
-    dt_fi = dt_fi.rollup({avg_st: d => op.mean(d.Surface_Temperature), avg_bt: d => op.mean(d.Bottom_Temperature)})
-    dt_fi = dt_fi.derive({year :`d => ${year_i}`})
+  let dt_fi = aq.from(rawData_temp).filter(d => d.Station == "Fox Island");
+  let dt_wr = aq.from(rawData_temp).filter(d => d.Station == "Whale Rock");
 
-    let dt_wr = aq.from(rawData_temp).params({year: year_i}).filter((d,$) => (op.includes(d.time, $.year) && d.Station == "Whale Rock"))
-    dt_wr = dt_wr.rollup({avg_st: d => op.mean(d.Surface_Temperature), avg_bt: d => op.mean(d.Bottom_Temperature)})
-    dt_wr = dt_wr.derive({year :`d => ${year_i}`})
+  return {"Fox Island": dt_fi.objects(), "Whale Rock": dt_wr.objects() }
+}
+
+const getMetrics = async(coordinates) => {
+  const sites = coordinates.map((row) => row.station_name);
+  const rawData_temp = await getFishData({ sites, datasetId: YSI_DATASET_ID});
+  let dt_fi = aq.from(rawData_temp).filter(d => d.Station == "Fox Island");
+  let dt_wr = aq.from(rawData_temp).filter(d => d.Station == "Whale Rock");
+
+  return {"Fox Island": dt_fi.objects(), "Whale Rock": dt_wr.objects() }
+}
+
+
+// const getMetrics = async (coordinates) => {
+//   const sites = coordinates.map((row) => row.station_name);
+//   const rawData_temp = await getFishData({ sites, datasetId: TEMP_DATASET_ID});
+//   const rawData_etc = await getFishData({ sites, datasetId: YSI_DATASET_ID});
+//   var i;
+//   let temp_table = {"Fox Island":[], "Whale Rock": [] }
+//   for (i = 1959; i < 2018; i++){
+//     let year_i = i.toString()
+//     let dt_fi = aq.from(rawData_temp).params({year: year_i}).filter((d,$) => (op.includes(d.time, $.year) && d.Station == "Fox Island"))
+//     dt_fi = dt_fi.rollup({avg_st: d => op.mean(d.Surface_Temperature), avg_bt: d => op.mean(d.Bottom_Temperature)})
+//     dt_fi = dt_fi.derive({year :`d => ${year_i}`})
+
+//     let dt_wr = aq.from(rawData_temp).params({year: year_i}).filter((d,$) => (op.includes(d.time, $.year) && d.Station == "Whale Rock"))
+//     dt_wr = dt_wr.rollup({avg_st: d => op.mean(d.Surface_Temperature), avg_bt: d => op.mean(d.Bottom_Temperature)})
+//     dt_wr = dt_wr.derive({year :`d => ${year_i}`})
    
-    temp_table["Fox Island"].push(dt_fi.objects()[0])
-    temp_table["Whale Rock"].push(dt_wr.objects()[0])
+//     temp_table["Fox Island"].push(dt_fi.objects()[0])
+//     temp_table["Whale Rock"].push(dt_wr.objects()[0])
     
-  }
+//   }
 
-  return temp_table
-};
+//   return temp_table
+// };
 
 // ROUTES
 
@@ -85,7 +104,7 @@ router.get("/coordinates", cacheMiddleware, async (req, res) => {
  *         description: Success! New content is now available.
  *
  */
-router.get("/samples", cacheMiddleware, async (req, res) => {
+router.get("/species", cacheMiddleware, async (req, res) => {
   const coordinates = mcache.get(`__express__/erddap/fish/coordinates`) ?? await getCoordinates();
   let data = await getSpecies(coordinates);
   res.send(data);
@@ -108,9 +127,27 @@ router.get("/metrics", cacheMiddleware, async (req, res) => {
   res.send(result);
 });
 
+/**
+ * @swagger
+ * /erddap/fish/coordinates:
+ *   get:
+ *     description: Get Fish Trawl Survey Locations ERDDAP
+ *     parameters:
+ *     responses:
+ *       200:
+ *         description: Success! New content is now available.
+ *
+ */
+router.get("/temps", cacheMiddleware, async (req, res) => {
+  const coordinates = mcache.get(`__express__/erddap/fish/coordinates`)
+  const result = await getTemps(coordinates);
+  res.send(result);
+});
+
 module.exports = {
   getCoordinates,
   getSpecies,
   getMetrics,
+  getTemps,
   router,
 };
