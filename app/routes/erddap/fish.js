@@ -42,9 +42,10 @@ const getSpecies = async (coordinates) => {
     let processed = newTable.objects().map((row) => {
       const species = `${fish}`;
       const station = row.Station;
-      const year = row.Year;
+      const year = (row.Year);
       const abun = row[fish];
-      return { species, station, year, abun };
+      const date = new Date(row.Year, 0)
+      return { species, station, year, date, abun };
     });
     newTable = aq.from(processed);
 
