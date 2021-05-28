@@ -22,7 +22,6 @@ const updateCache = async (timeout) => {
   // const daSamples = await da.getSamples(daCoordinates);
   // mcache.put(`${keyBase}/da/samples`, daSamples, timeout);
 
-  // TODO: review if this initialization of the cache is correct
   const fishCoordinates = await fish.getCoordinates();
   mcache.put(`${keyBase}/fish/coordinates`, fishCoordinates, timeout);
   const fishSamples = await fish.getSpecies(fishCoordinates);

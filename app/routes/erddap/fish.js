@@ -16,8 +16,6 @@ const CATCH_DATASET_ID = "fish_trawl_3ce2_fedf_6833";
 // HELPER FUNCTIONS
 
 const getCoordinates = async () => {
-  // TODO: figure out how to get the coordinates for whale rock and fox island
-  // might be able to use `getBuoyCoordinates`, but might not
   return [
     { station_name: "Whale Rock", longitude: -71.4208, latitude: 41.4395 },
     { station_name: "Fox Island", longitude: -71.4186, latitude: 41.5542 },
@@ -76,30 +74,6 @@ const getMetrics = async (coordinates) => {
 
   return { "Fox Island": dt_fi.objects(), "Whale Rock": dt_wr.objects() };
 };
-
-// const getMetrics = async (coordinates) => {
-//   const sites = coordinates.map((row) => row.station_name);
-//   const rawData_temp = await getFishData({ sites, datasetId: TEMP_DATASET_ID});
-//   const rawData_etc = await getFishData({ sites, datasetId: YSI_DATASET_ID});
-//   var i;
-//   let temp_table = {"Fox Island":[], "Whale Rock": [] }
-//   for (i = 1959; i < 2018; i++){
-//     let year_i = i.toString()
-//     let dt_fi = aq.from(rawData_temp).params({year: year_i}).filter((d,$) => (op.includes(d.time, $.year) && d.Station == "Fox Island"))
-//     dt_fi = dt_fi.rollup({avg_st: d => op.mean(d.Surface_Temperature), avg_bt: d => op.mean(d.Bottom_Temperature)})
-//     dt_fi = dt_fi.derive({year :`d => ${year_i}`})
-
-//     let dt_wr = aq.from(rawData_temp).params({year: year_i}).filter((d,$) => (op.includes(d.time, $.year) && d.Station == "Whale Rock"))
-//     dt_wr = dt_wr.rollup({avg_st: d => op.mean(d.Surface_Temperature), avg_bt: d => op.mean(d.Bottom_Temperature)})
-//     dt_wr = dt_wr.derive({year :`d => ${year_i}`})
-
-//     temp_table["Fox Island"].push(dt_fi.objects()[0])
-//     temp_table["Whale Rock"].push(dt_wr.objects()[0])
-
-//   }
-
-//   return temp_table
-// };
 
 // ROUTES
 
