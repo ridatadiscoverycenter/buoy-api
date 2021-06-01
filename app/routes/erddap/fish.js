@@ -95,9 +95,9 @@ router.get("/coordinates", cacheMiddleware, async (req, res) => {
 
 /**
  * @swagger
- * /erddap/fish/samples:
+ * /erddap/fish/species:
  *   get:
- *     description: Get Fish Trawl Catch Samples from ERDDAP
+ *     description: Get Fish Trawl Catch Species from ERDDAP
  *     parameters:
  *     responses:
  *       200:
@@ -114,9 +114,9 @@ router.get("/species", cacheMiddleware, async (req, res) => {
 
 /**
  * @swagger
- * /erddap/fish/coordinates:
+ * /erddap/fish/metrics:
  *   get:
- *     description: Get Fish Trawl Survey Locations ERDDAP
+ *     description: Get Fish Trawl Survey Water Metrics from ERDDAP
  *     parameters:
  *     responses:
  *       200:
@@ -131,9 +131,9 @@ router.get("/metrics", cacheMiddleware, async (req, res) => {
 
 /**
  * @swagger
- * /erddap/fish/coordinates:
+ * /erddap/fish/temps:
  *   get:
- *     description: Get Fish Trawl Survey Locations ERDDAP
+ *     description: Get Fish Trawl Survey Water Temps from ERDDAP
  *     parameters:
  *     responses:
  *       200:
