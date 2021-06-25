@@ -5,6 +5,9 @@
   "main": "app/server.js",
   "author": "Fernando Gelin, Mary McGrath",
   "license": "MIT",
+  "engines": {
+    "node": ">16.0.0"
+  },
   "scripts": {
     "start": "node app/server.js",
     "dev": "nodemon app/server.js",
@@ -12,21 +15,20 @@
     "test": "mocha",
     "jsdoc": "jsdoc app/server.js",
     "swagger": "swagger-jsdoc -d app/swaggerDef.js app/routes/content.js",
-    "commit": "git-cz",
-    "prettify": "prettier --write app"
+    "prettify": "prettier --write app",
+    "getfish": "node scripts/scrape_fish_db.js"
   },
   "devDependencies": {
     "chai": "^4.2.0",
     "chai-http": "^4.3.0",
-    "cz-conventional-changelog": "^3.3.0",
-    "eslint": "^7.18.0",
-    "git-cz": "^4.7.6",
-    "mocha": "^8.2.1",
+    "cheerio": "*",
+    "eslint": "^7.28.0",
+    "mocha": "^9.0.0",
     "nodemon": "^2.0.7",
-    "prettier": "^2.2.1"
+    "prettier": "^2.3.1"
   },
   "dependencies": {
-    "arquero": "^2.2.0",
+    "arquero": "^4.8.1",
     "axios": "^0.21.1",
     "express": "^4.17.1",
     "http-errors": "^1.8.0",
@@ -36,11 +38,6 @@
     "morgan": "^1.10.0",
     "swagger-jsdoc": "^6.0.1",
     "swagger-ui-express": "^4.1.6"
-  },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
-    }
   },
   "_moduleAliases": {
     "@": "app"

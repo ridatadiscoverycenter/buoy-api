@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
+const utils = require("@/utils");
 const { cacheMiddleware } = require("@/middleware/cache");
 const mcache = require("memory-cache");
 
@@ -34,20 +35,19 @@ const getSpecies = async (coordinates) => {
   let final_fish = [];
   let newTable = [];
   for (index in fish_list) {
-    const fish = fish_list[index];
-    newTable = dt.select(`${fish}`, "Station", "Year");
+    const species = fish_list[index];
+    newTable = dt.select(species, "Station", "Year");
 
     let processed = newTable.objects().map((row) => {
-      const species = `${fish}`;
+      const title = utils.humanizeSnakeCase(species);
       const station = row.Station;
-      const year = (row.Year);
-      const abun = row[fish];
-      const date = new Date(row.Year, 0)
-      return { species, station, year, date, abun };
+      const year = row.Year;
+      const abun = row[species];
+      return { species, title, station, year, abun };
     });
     newTable = aq.from(processed);
 
-    if (final_fish.length == 0) {
+    if (final_fish.length === 0) {
       final_fish = newTable;
     } else {
       final_fish = final_fish.concat(newTable);
@@ -59,20 +59,43 @@ const getSpecies = async (coordinates) => {
 
 const getTemps = async (coordinates) => {
   const sites = coordinates.map((row) => row.station_name);
-  const rawData_temp = await getFishData({ sites, datasetId: TEMP_DATASET_ID });
-  let dt_fi = aq.from(rawData_temp).filter((d) => d.Station == "Fox Island");
-  let dt_wr = aq.from(rawData_temp).filter((d) => d.Station == "Whale Rock");
+  const rawTemps = await getFishData({ sites, datasetId: TEMP_DATASET_ID });
+  let temps = aq
+    .from(rawTemps)
+    .fold(["Surface_Temperature", "Bottom_Temperature"], {
+      as: ["key", "temp"],
+    })
+    .derive({
+      year_month: (d) =>
+        op.utcdatetime(op.utcyear(d.time), op.utcmonth(d.time)),
+      level: (d) => op.split(d.key, "_", 1)[0],
+      month: (d) => op.utcmonth(d.time),
+    })
+    .groupby(["Station", "year_month", "level", "month"])
+    .rollup({ mean_temp: op.mean("temp") });
 
-  return { "Fox Island": dt_fi.objects(), "Whale Rock": dt_wr.objects() };
+  const meanTemps = temps
+    .groupby(["Station", "level", "month"])
+    .rollup({ monthly_mean: op.mean("mean_temp") });
+
+  temps = temps.join(meanTemps).derive({ delta: d => d.mean_temp - d.monthly_mean}).objects();
+  return temps;
+};
+
+const getMonthlyTemps = (temps) => {
+  const meanTemps = aq
+    .from(temps)
+    .derive({ month: (d) => op.utcmonth(d.year_month) })
+    .groupby(["Station", "level", "month"])
+    .rollup({ mean_temp: op.mean("mean_temp") })
+    .objects();
+  return meanTemps;
 };
 
 const getMetrics = async (coordinates) => {
   const sites = coordinates.map((row) => row.station_name);
-  const rawData_temp = await getFishData({ sites, datasetId: YSI_DATASET_ID });
-  let dt_fi = aq.from(rawData_temp).filter((d) => d.Station == "Fox Island");
-  let dt_wr = aq.from(rawData_temp).filter((d) => d.Station == "Whale Rock");
-
-  return { "Fox Island": dt_fi.objects(), "Whale Rock": dt_wr.objects() };
+  const metrics = await getFishData({ sites, datasetId: YSI_DATASET_ID });
+  return metrics;
 };
 
 // ROUTES

@@ -17,10 +17,11 @@ const updateCache = async (timeout) => {
     console.log(`cache for ${src} complete`);
   });
 
-  // const daCoordinates = await da.getCoordinates();
-  // mcache.put(`${keyBase}/da/coordinates`, daCoordinates, timeout);
-  // const daSamples = await da.getSamples(daCoordinates);
-  // mcache.put(`${keyBase}/da/samples`, daSamples, timeout);
+  const daCoordinates = await da.getCoordinates();
+  mcache.put(`${keyBase}/da/coordinates`, daCoordinates, timeout);
+  const daSamples = await da.getSamples(daCoordinates);
+  mcache.put(`${keyBase}/da/samples`, daSamples, timeout);
+  console.log(`cache for da complete`);
 
   const fishCoordinates = await fish.getCoordinates();
   mcache.put(`${keyBase}/fish/coordinates`, fishCoordinates, timeout);
@@ -30,6 +31,7 @@ const updateCache = async (timeout) => {
   mcache.put(`${keyBase}/fish/metrics`, fishMetrics, timeout);
   const fishTemps = await fish.getTemps(fishCoordinates);
   mcache.put(`${keyBase}/fish/temps`, fishTemps, timeout);
+  console.log(`cache for fish complete`);
 };
 
 module.exports = {
