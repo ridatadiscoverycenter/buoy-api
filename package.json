@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "start": "node app/server.js",
-    "dev": "nodemon app/server.js",
+    "dev": "dotenv -e .env.dev nodemon app/server.js",
     "dev:local": "BUOY_API_ERDDAP_URL=http://localhost:8080/erddap/tabledap nodemon app/server.js",
     "test": "mocha",
     "jsdoc": "jsdoc app/server.js",
@@ -19,6 +19,7 @@
     "chai": "^4.2.0",
     "chai-http": "^4.3.0",
     "cz-conventional-changelog": "^3.3.0",
+    "dotenv-cli": "^4.0.0",
     "eslint": "^7.18.0",
     "git-cz": "^4.7.6",
     "mocha": "^8.2.1",
@@ -35,6 +36,7 @@
     "memory-cache": "^0.2.0",
     "module-alias": "^2.2.2",
     "morgan": "^1.10.0",
+    "mysql": "^2.18.1",
     "swagger-jsdoc": "^6.0.1",
     "swagger-ui-express": "^4.1.6"
   },
