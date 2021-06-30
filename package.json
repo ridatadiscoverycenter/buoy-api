@@ -6,7 +6,7 @@
   "author": "Fernando Gelin, Mary McGrath",
   "license": "MIT",
   "scripts": {
-    "start": "node app/server.js",
+    "start": "dotenv -e .env node app/server.js",
     "dev": "dotenv -e .env.dev nodemon app/server.js",
     "dev:local": "BUOY_API_ERDDAP_URL=http://localhost:8080/erddap/tabledap nodemon app/server.js",
     "test": "mocha",
