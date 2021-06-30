@@ -78,7 +78,10 @@ const getTemps = async (coordinates) => {
     .groupby(["Station", "level", "month"])
     .rollup({ monthly_mean: op.mean("mean_temp") });
 
-  temps = temps.join(meanTemps).derive({ delta: d => d.mean_temp - d.monthly_mean}).objects();
+  temps = temps
+    .join(meanTemps)
+    .derive({ delta: (d) => d.mean_temp - d.monthly_mean })
+    .objects();
   return temps;
 };
 
