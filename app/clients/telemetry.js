@@ -12,16 +12,16 @@ const pool = mysql.createPool({
 const query = util.promisify(pool.query).bind(pool);
 
 const getLatestRecord = async (buoyId, tableType) => {
-  return await query(
-    `SELECT * FROM \`${buoyId}_${tableType}\` ORDER BY TmStamp desc LIMIT 1`
-  );
+  return await query(`SELECT * FROM ?? ORDER BY TmStamp desc LIMIT 1`, [
+    `${buoyId}_${tableType}`,
+  ]);
 };
 
-const getRecordsSince = async (buoyId, tableType, startDt) => {
-  return await query(
-    `SELECT * FROM \`${buoyId}_${tableType}\` WHERE TmStamp >= ?`,
-    [startDt]
-  );
+const getRecordsSince = async (buoyId, tableType, startDatetime) => {
+  return await query(`SELECT * FROM ?? WHERE TmStamp >= ?`, [
+    `${buoyId}_${tableType}`,
+    startDatetime,
+  ]);
 };
 
 module.exports = {
