@@ -5,7 +5,7 @@ const mcache = require("memory-cache");
 
 const updateCache = async (timeout) => {
   const end = new Date().toISOString(); // now
-  const keyBase = `__express__/erddap`;
+  const keyBase = "__express__/erddap";
   Object.entries(common.datasetMap).map(async ([src, datasetId]) => {
     const summary = await common.getSummary(src);
     mcache.put(`${keyBase}/${src}/summary`, summary, timeout);
