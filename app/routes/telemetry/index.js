@@ -36,7 +36,7 @@ router.param("tableType", (req, res, next, tableType) => {
 });
 
 // helper function to get date n days ago
-const nDaysAgoDate = (n) => new Date(Date.now() - new Date(1970, 0, n));
+const nDaysAgoDate = (n) => new Date(Date.now() - n * 24 * 60 * 60 * 1000);
 
 /**
  * @swagger
