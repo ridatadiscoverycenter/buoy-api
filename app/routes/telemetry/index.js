@@ -36,7 +36,7 @@ router.param("tableType", (req, res, next, tableType) => {
 });
 
 // helper function to get date n days ago
-const nDaysAgoDate = (n) => new Date(Date.now() - new Date(1970, 0, n));
+const nDaysAgoDate = (n) => new Date(Date.now() - n * 24 * 60 * 60 * 1000);
 
 /**
  * @swagger
@@ -71,6 +71,7 @@ router.get("/:buoyId/:tableType/lastone", async (req, res) => {
 // Ex:  http://localhost:8088/telemetry/Buoy-620/System/lastday
 router.get("/:buoyId/:tableType/lastday", async (req, res) => {
   const startDatetime = nDaysAgoDate(1);
+  console.log(startDatetime);
   const result = await getRecordsSince(
     req.params.buoyId,
     req.params.tableType,
