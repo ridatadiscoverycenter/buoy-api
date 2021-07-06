@@ -71,7 +71,6 @@ router.get("/:buoyId/:tableType/lastone", async (req, res) => {
 // Ex:  http://localhost:8088/telemetry/Buoy-620/System/lastday
 router.get("/:buoyId/:tableType/lastday", async (req, res) => {
   const startDatetime = nDaysAgoDate(1);
-  console.log(startDatetime);
   const result = await getRecordsSince(
     req.params.buoyId,
     req.params.tableType,
