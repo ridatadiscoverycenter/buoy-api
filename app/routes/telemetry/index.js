@@ -35,10 +35,6 @@ router.param("tableType", (req, res, next, tableType) => {
   }
 });
 
-// helper function to get date n days ago as a UTC ISO string
-const nDaysAgoDate = (n) =>
-  new Date(Date.now() - Date.UTC(1970, 0, n + 1)).toISOString();
-
 /**
  * @swagger
  * /telemetry/:buoyId/:tableType/lastone:
@@ -71,11 +67,10 @@ router.get("/:buoyId/:tableType/lastone", async (req, res) => {
 
 // Ex:  http://localhost:8088/telemetry/Buoy-620/System/lastday
 router.get("/:buoyId/:tableType/lastday", async (req, res) => {
-  const startDatetime = nDaysAgoDate(1);
   const result = await getRecordsSince(
     req.params.buoyId,
     req.params.tableType,
-    startDatetime
+    1
   );
   res.send(result);
 });
@@ -94,11 +89,10 @@ router.get("/:buoyId/:tableType/lastday", async (req, res) => {
 
 // Ex:  http://localhost:8088/telemetry/Buoy-620/System/lastweek
 router.get("/:buoyId/:tableType/lastweek", async (req, res) => {
-  const startDatetime = nDaysAgoDate(7);
   const result = await getRecordsSince(
     req.params.buoyId,
     req.params.tableType,
-    startDatetime
+    7
   );
   res.send(result);
 });
