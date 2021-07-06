@@ -35,8 +35,9 @@ router.param("tableType", (req, res, next, tableType) => {
   }
 });
 
-// helper function to get date n days ago
-const nDaysAgoDate = (n) => new Date(Date.now() - n * 24 * 60 * 60 * 1000);
+// helper function to get date n days ago as a UTC ISO string
+const nDaysAgoDate = (n) =>
+  new Date(Date.now() - Date.UTC(1970, 0, n + 1)).toISOString();
 
 /**
  * @swagger
