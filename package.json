@@ -15,7 +15,7 @@
     "test": "mocha",
     "jsdoc": "jsdoc app/server.js",
     "swagger": "swagger-jsdoc -d app/swaggerDef.js app/routes/content.js",
-    "prettify": "prettier --write app",
+    "prettify": "prettier --write app scripts",
     "getfish": "node scripts/scrape_fish_db.js"
   },
   "devDependencies": {

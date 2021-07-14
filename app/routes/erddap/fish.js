@@ -3,8 +3,9 @@ const router = express.Router();
 
 const utils = require("@/utils");
 const { cacheMiddleware } = require("@/middleware/cache");
-const mcache = require("memory-cache");
 
+const fs = require("fs");
+const mcache = require("memory-cache");
 const aq = require("arquero");
 const op = aq.op;
 
@@ -13,19 +14,15 @@ const { getFishData } = require("@/clients/erddap");
 const YSI_DATASET_ID = "fish_trawl_79f9_f9fd_5a43";
 const TEMP_DATASET_ID = "fish_trawl_79f9_f9fd_5a42";
 const CATCH_DATASET_ID = "fish_trawl_3ce2_fedf_6833";
+const COORDINATES = [
+  { station_name: "Whale Rock", longitude: -71.4208, latitude: 41.4395 },
+  { station_name: "Fox Island", longitude: -71.4186, latitude: 41.5542 },
+];
 
 // HELPER FUNCTIONS
 
-const getCoordinates = async () => {
-  return [
-    { station_name: "Whale Rock", longitude: -71.4208, latitude: 41.4395 },
-    { station_name: "Fox Island", longitude: -71.4186, latitude: 41.5542 },
-  ];
-};
-
-const getSpecies = async (coordinates) => {
-  const sites = coordinates.map((row) => row.station_name);
-  const rawData = await getFishData({ sites, datasetId: CATCH_DATASET_ID });
+const getSpecies = async () => {
+  const rawData = await getFishData({ datasetId: CATCH_DATASET_ID });
   const dt = aq.from(rawData);
 
   const fish_list = aq.from(rawData).columnNames();
@@ -39,7 +36,10 @@ const getSpecies = async (coordinates) => {
     newTable = dt.select(species, "Station", "Year");
 
     let processed = newTable.objects().map((row) => {
-      const title = utils.humanizeSnakeCase(species);
+      let title = utils.humanizeSnakeCase(species);
+      if (title === "Alosa Spp") {
+        title = "Alewife";
+      }
       const station = row.Station;
       const year = row.Year;
       const abun = row[species];
@@ -57,9 +57,8 @@ const getSpecies = async (coordinates) => {
   return final_fish.objects();
 };
 
-const getTemps = async (coordinates) => {
-  const sites = coordinates.map((row) => row.station_name);
-  const rawTemps = await getFishData({ sites, datasetId: TEMP_DATASET_ID });
+const getTemps = async () => {
+  const rawTemps = await getFishData({ datasetId: TEMP_DATASET_ID });
   let temps = aq
     .from(rawTemps)
     .fold(["Surface_Temperature", "Bottom_Temperature"], {
@@ -95,9 +94,8 @@ const getMonthlyTemps = (temps) => {
   return meanTemps;
 };
 
-const getMetrics = async (coordinates) => {
-  const sites = coordinates.map((row) => row.station_name);
-  const metrics = await getFishData({ sites, datasetId: YSI_DATASET_ID });
+const getMetrics = async () => {
+  const metrics = await getFishData({ datasetId: YSI_DATASET_ID });
   return metrics;
 };
 
@@ -114,9 +112,8 @@ const getMetrics = async (coordinates) => {
  *         description: Success! New content is now available.
  *
  */
-router.get("/coordinates", cacheMiddleware, async (req, res) => {
-  const result = await getCoordinates();
-  res.send(result);
+router.get("/coordinates", (req, res) => {
+  res.send(COORDINATES);
 });
 
 /**
@@ -131,10 +128,7 @@ router.get("/coordinates", cacheMiddleware, async (req, res) => {
  *
  */
 router.get("/species", cacheMiddleware, async (req, res) => {
-  const coordinates =
-    mcache.get(`__express__/erddap/fish/coordinates`) ??
-    (await getCoordinates());
-  let data = await getSpecies(coordinates);
+  let data = await getSpecies();
   res.send(data);
 });
 
@@ -150,8 +144,7 @@ router.get("/species", cacheMiddleware, async (req, res) => {
  *
  */
 router.get("/metrics", cacheMiddleware, async (req, res) => {
-  const coordinates = mcache.get(`__express__/erddap/fish/coordinates`);
-  const result = await getMetrics(coordinates);
+  const result = await getMetrics();
   res.send(result);
 });
 
@@ -167,13 +160,32 @@ router.get("/metrics", cacheMiddleware, async (req, res) => {
  *
  */
 router.get("/temps", cacheMiddleware, async (req, res) => {
-  const coordinates = mcache.get(`__express__/erddap/fish/coordinates`);
-  const result = await getTemps(coordinates);
+  const result = await getTemps();
   res.send(result);
 });
 
+/**
+ * @swagger
+ * /erddap/fish/info/:species:
+ *   get:
+ *     description: Get Fish information for a given species
+ *     parameters:
+ *     responses:
+ *       200:
+ *         description: Success! New content is now available.
+ *
+ */
+router.get("/info/:species", cacheMiddleware, (req, res) => {
+  try {
+    const data = fs.readFileSync(`data/fish/${req.params.species}.json`);
+    res.send(JSON.parse(data));
+  } catch (e) {
+    console.log(e);
+    res.send({});
+  }
+});
+
 module.exports = {
-  getCoordinates,
   getSpecies,
   getMetrics,
   getTemps,
