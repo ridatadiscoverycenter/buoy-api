@@ -11,14 +11,11 @@ const getFishData = (name, href) => {
     .get(href)
     .then((r) => {
       const $fish = cheerio.load(r.data);
-      const sciName = $fish("#ss-sciname")
-        .text()
-        .split("(", 1)[0]
-        .trim();
+      const sciName = $fish("#ss-sciname").text().split("(", 1)[0].trim();
 
       // try again if this one failed
       if (sciName === "") {
-        console.log("retrying ", name)
+        console.log("retrying ", name);
         getFishData(name, href);
         return;
       }
@@ -92,7 +89,7 @@ const getFishData = (name, href) => {
       console.log(name);
     })
     .catch((e) => console.log(e));
-}
+};
 
 axios
   .get(URI_SPECIES_URL)
@@ -104,7 +101,7 @@ axios
         const name = $(row).find("td").first().text().trim();
         if ($(row).find("a").length > 0) {
           const href = $(row).find("a").attr("href");
-          getFishData(name, href)
+          getFishData(name, href);
         } else if (name && name !== "COMMON NAME") {
           const data = { name, sciName: $(row).find("td").last().text() };
           fs.writeFileSync(`data/fish/${name}.json`, JSON.stringify(data));

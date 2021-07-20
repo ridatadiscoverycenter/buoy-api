@@ -37,8 +37,20 @@ const getSpecies = async () => {
 
     let processed = newTable.objects().map((row) => {
       let title = utils.humanizeSnakeCase(species);
+
+      // make data titles match the uri website
       if (title === "Alosa Spp") {
         title = "Alewife";
+      } else if (title === "Longhorned Sculpin") {
+        title = "Longhorn Sculpin";
+      } else if (title === "Long Finned Squid") {
+        title = "Longfin Squid";
+      } else if (title === "Sea Star") {
+        title = "Starfish";
+      } else if (title === "Spider Crab") {
+        title = "Spider Crabs";
+      } else if (title === "Windowpane") {
+        title = "Windowpane Flounder";
       }
       const station = row.Station;
       const year = row.Year;
