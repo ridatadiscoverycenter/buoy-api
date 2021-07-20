@@ -25,8 +25,6 @@ const updateCache = async (timeout) => {
 
   const fishSamples = await fish.getSpecies();
   mcache.put(`${keyBase}/fish/samples`, fishSamples, timeout);
-  const fishMetrics = await fish.getMetrics();
-  mcache.put(`${keyBase}/fish/metrics`, fishMetrics, timeout);
   const fishTemps = await fish.getTemps();
   mcache.put(`${keyBase}/fish/temps`, fishTemps, timeout);
   console.log(`cache for fish complete`);

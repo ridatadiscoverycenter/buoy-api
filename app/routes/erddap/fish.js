@@ -106,11 +106,6 @@ const getMonthlyTemps = (temps) => {
   return meanTemps;
 };
 
-const getMetrics = async () => {
-  const metrics = await getFishData({ datasetId: YSI_DATASET_ID });
-  return metrics;
-};
-
 // ROUTES
 
 /**
@@ -142,22 +137,6 @@ router.get("/coordinates", (req, res) => {
 router.get("/species", cacheMiddleware, async (req, res) => {
   let data = await getSpecies();
   res.send(data);
-});
-
-/**
- * @swagger
- * /erddap/fish/metrics:
- *   get:
- *     description: Get Fish Trawl Survey Water Metrics from ERDDAP
- *     parameters:
- *     responses:
- *       200:
- *         description: Success! New content is now available.
- *
- */
-router.get("/metrics", cacheMiddleware, async (req, res) => {
-  const result = await getMetrics();
-  res.send(result);
 });
 
 /**
