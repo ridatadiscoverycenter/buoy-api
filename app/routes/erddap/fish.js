@@ -178,7 +178,6 @@ router.get("/info/:species", cacheMiddleware, (req, res) => {
 
 module.exports = {
   getSpecies,
-  getMetrics,
   getTemps,
   router,
 };
