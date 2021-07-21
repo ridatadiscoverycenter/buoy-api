@@ -1,5 +1,4 @@
 require("module-alias/register");
-require("dotenv").config();
 const express = require("express");
 const logger = require("morgan");
 const createError = require("http-errors");

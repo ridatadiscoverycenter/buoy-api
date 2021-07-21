@@ -121,7 +121,25 @@ const jsonTableToObjects = (table) => {
   });
 };
 
+const humanizeSnakeCase = (v) => {
+  let nextUpper = true;
+  let res = "";
+  for (let c of v) {
+    if (nextUpper) {
+      res += c.toUpperCase();
+      nextUpper = false;
+    } else if (c === "_") {
+      res += " ";
+      nextUpper = true;
+    } else {
+      res += c;
+    }
+  }
+  return res;
+};
+
 module.exports = {
   downsample,
   jsonTableToObjects,
+  humanizeSnakeCase,
 };
