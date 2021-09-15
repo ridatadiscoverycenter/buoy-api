@@ -36,15 +36,24 @@ const getSingleBuoyGeoJsonData = ({
   const startDate = start ?? "2003-01-01T12:00:00Z";
   const endDate = end ?? "2012-12-31T12:00:00Z";
   idString = idString ?? `"${id}"`;
+  const queryString = `/${datasetId}.geoJson?${variables.join(
+    ","
+  )},${baseVariables.join(
+    ","
+  )}&station_name=${idString}&time>=${startDate}&time<=${endDate}`;
   return erddapClient
-    .get(
-      `/${datasetId}.geoJson?${variables.join(",")},${baseVariables.join(
-        ","
-      )}&station_name=${idString}&time>=${startDate}&time<=${endDate}`
-    )
+    .get(queryString)
     .then((res) => res)
-    .catch((err) => {
-      throw err;
+    .catch((error) => {
+      if (error.response.status >= 400 && error.response.status < 500) {
+        console.log(
+          `Query "${queryString}" resulted in a 400 series error - returning []`
+        );
+        return { data: { features: [] } };
+      } else {
+        console.log(error);
+        throw error;
+      }
     });
 };
 

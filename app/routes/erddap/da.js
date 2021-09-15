@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const ash = require("express-async-handler");
 
 const { cacheMiddleware } = require("@/middleware/cache");
 const mcache = require("memory-cache");
@@ -53,10 +54,14 @@ const getSamples = async (coordinates) => {
  *         description: Success! New content is now available.
  *
  */
-router.get("/coordinates", cacheMiddleware, async (req, res) => {
-  const result = await getCoordinates();
-  res.send(result);
-});
+router.get(
+  "/coordinates",
+  cacheMiddleware,
+  ash(async (req, res) => {
+    const result = await getCoordinates();
+    res.send(result);
+  })
+);
 
 /**
  * @swagger
@@ -69,12 +74,17 @@ router.get("/coordinates", cacheMiddleware, async (req, res) => {
  *         description: Success! New content is now available.
  *
  */
-router.get("/samples", cacheMiddleware, async (req, res) => {
-  const coordinates =
-    mcache.get("__express__/erddap/da/coordinates") ?? (await getCoordinates());
-  let data = await getSamples(coordinates);
-  res.send(data);
-});
+router.get(
+  "/samples",
+  cacheMiddleware,
+  ash(async (req, res) => {
+    const coordinates =
+      mcache.get("__express__/erddap/da/coordinates") ??
+      (await getCoordinates());
+    let data = await getSamples(coordinates);
+    res.send(data);
+  })
+);
 
 module.exports = {
   getCoordinates,

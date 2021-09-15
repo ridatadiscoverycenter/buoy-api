@@ -8,11 +8,13 @@ const utils = require("@/utils");
 
 const datasetMap = {
   buoy: "combined_e784_bee5_492e",
+  mabuoy: "ma_buoy_data_a6c9_12eb_1ec5",
   model: "model_data_77bb_15c2_6ab3",
   plankton: "plankton_time_series_7615_c513_ef8e",
 };
 const summaryUnitMap = {
   buoy: "month",
+  mabuoy: "month",
   model: "year",
   plankton: "month",
 };
@@ -32,19 +34,14 @@ const stationMap = {
   bid16: "Potters Cove",
   bid17: "GSO Dock",
   bid21: "Station II",
+  bid101: "Cole",
+  bid102: "Taunton",
 };
 
 const queryErddapBuoys = async (payload, rawNumPoints) => {
   const numPoints = rawNumPoints ?? 1000;
 
-  let res;
-  try {
-    res = await getMultiBuoyGeoJsonData(payload);
-  } catch (e) {
-    console.log(e.config.url);
-    console.log(e.response.data);
-    return [];
-  }
+  const res = await getMultiBuoyGeoJsonData(payload);
 
   let processed = res.data.features.map((feature) => {
     const date = new Date(feature.properties.time);
