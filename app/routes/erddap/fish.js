@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const ash = require("express-async-handler");
 
 const utils = require("@/utils");
 const { cacheMiddleware } = require("@/middleware/cache");
@@ -134,10 +135,14 @@ router.get("/coordinates", (req, res) => {
  *         description: Success! New content is now available.
  *
  */
-router.get("/species", cacheMiddleware, async (req, res) => {
-  let data = await getSpecies();
-  res.send(data);
-});
+router.get(
+  "/species",
+  cacheMiddleware,
+  ash(async (req, res) => {
+    let data = await getSpecies();
+    res.send(data);
+  })
+);
 
 /**
  * @swagger
@@ -150,10 +155,14 @@ router.get("/species", cacheMiddleware, async (req, res) => {
  *         description: Success! New content is now available.
  *
  */
-router.get("/temps", cacheMiddleware, async (req, res) => {
-  const result = await getTemps();
-  res.send(result);
-});
+router.get(
+  "/temps",
+  cacheMiddleware,
+  ash(async (req, res) => {
+    const result = await getTemps();
+    res.send(result);
+  })
+);
 
 /**
  * @swagger

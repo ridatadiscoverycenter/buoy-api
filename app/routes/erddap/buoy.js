@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const ash = require("express-async-handler");
 const utils = require("@/utils");
 const common = require("@/routes/erddap/common");
 const { cacheMiddleware } = require("@/middleware/cache");
@@ -58,27 +59,34 @@ router.param("source", (req, res, next, source) => {
 
 // Ex:  http://localhost:8080/erddap/buoy/query?ids=bid2,bid3&variable=WaterTempSurface&start=2010-07-01T12:00:00Z&end=2010-07-05T12:00:00Z
 
-router.get("/:source/query", async (req, res) => {
-  const ids = req.query.ids.split(",");
+router.get(
+  "/:source/query",
+  ash(async (req, res) => {
+    const ids = req.query.ids.split(",");
 
-  // check variables queried exist for this dataset, short circuit if they don't
-  const queryVariables = req.query.variables.split(",");
-  const datasetVariables =
-    mcache.get(`__express__/erddap/${req.params.source}/variables`) ?? [];
-  const variables = queryVariables.filter((v) => datasetVariables.includes(v));
-  if (variables.length === 0) res.send([]);
+    // check variables queried exist for this dataset, short circuit if they don't
+    const queryVariables = req.query.variables.split(",");
+    const datasetVariables =
+      mcache.get(`__express__/erddap/${req.params.source}/variables`) ?? [];
+    const variables = queryVariables
+      .filter((v) => datasetVariables.includes(v))
+      .filter((v) => !v.includes("Qualifiers"));
+    if (variables.length === 0) {
+      return res.send([]);
+    }
 
-  const payload = {
-    ids,
-    datasetId: req.datasetId,
-    variables,
-    start: req.query.start,
-    end: req.query.end,
-  };
+    const payload = {
+      ids,
+      datasetId: req.datasetId,
+      variables,
+      start: req.query.start,
+      end: req.query.end,
+    };
 
-  let data = await common.queryErddapBuoys(payload, req.query.numPoints);
-  res.send(data);
-});
+    let data = await common.queryErddapBuoys(payload, req.query.numPoints);
+    res.send(data);
+  })
+);
 
 /**
  * @swagger
@@ -94,10 +102,14 @@ router.get("/:source/query", async (req, res) => {
 
 // Ex:  http://localhost:8080/erddap/buoy/coordinates?ids=bid2,bid3
 
-router.get("/:source/coordinates", cacheMiddleware, async (req, res) => {
-  const data = await common.getBuoyCoordinates(req.datasetId);
-  res.send(data);
-});
+router.get(
+  "/:source/coordinates",
+  cacheMiddleware,
+  ash(async (req, res) => {
+    const data = await common.getBuoyCoordinates(req.datasetId);
+    res.send(data);
+  })
+);
 
 /**
  * @swagger
@@ -112,9 +124,13 @@ router.get("/:source/coordinates", cacheMiddleware, async (req, res) => {
 
 // Ex:  http://localhost:8080/erddap/buoy/summary
 
-router.get("/:source/summary", cacheMiddleware, async (req, res) => {
-  res.send(await common.getSummary(req.params.source));
-});
+router.get(
+  "/:source/summary",
+  cacheMiddleware,
+  ash(async (req, res) => {
+    res.send(await common.getSummary(req.params.source));
+  })
+);
 
 /**
  * @swagger
@@ -129,8 +145,12 @@ router.get("/:source/summary", cacheMiddleware, async (req, res) => {
 
 // Ex:  http://localhost:8080/erddap/buoy/summary
 
-router.get("/:source/variables", cacheMiddleware, async (req, res) => {
-  res.send(await common.getVariables(req.datasetId));
-});
+router.get(
+  "/:source/variables",
+  cacheMiddleware,
+  ash(async (req, res) => {
+    res.send(await common.getVariables(req.datasetId));
+  })
+);
 
 module.exports = router;

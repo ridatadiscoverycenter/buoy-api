@@ -14,12 +14,17 @@ aq.addFunction("utcsixhours", (x) => {
 });
 
 // downsample the buoy points to approximately the desired number of points
-// TODO: have this handle multiple buoys in one pass
 const downsample = (data, numPoints, variables) => {
+  if (data.length === 0) {
+    return data;
+  }
+
   let full_dt = aq
     .from(data)
     .fold(variables, { as: ["variable", "value"] })
-    .filter("d.value");
+    .filter("d.value")
+    .orderby("station_name", "variable", "time")
+    .reify();
 
   if (full_dt.numRows <= numPoints) {
     return full_dt.objects();

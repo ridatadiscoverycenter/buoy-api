@@ -1,5 +1,7 @@
 const express = require("express");
 const router = express.Router();
+const ash = require("express-async-handler");
+
 const { getLatestRecord, getRecordsSince } = require("@/clients/telemetry.js");
 
 const BUOY_IDS = ["Buoy-620", "Buoy-720", "Castle_Hill"];
@@ -48,10 +50,16 @@ router.param("tableType", (req, res, next, tableType) => {
  */
 
 // Ex:  http://localhost:8088/telemetry/Buoy-620/System/lastone
-router.get("/:buoyId/:tableType/lastone", async (req, res) => {
-  const result = await getLatestRecord(req.params.buoyId, req.params.tableType);
-  res.send(result);
-});
+router.get(
+  "/:buoyId/:tableType/lastone",
+  ash(async (req, res) => {
+    const result = await getLatestRecord(
+      req.params.buoyId,
+      req.params.tableType
+    );
+    res.send(result);
+  })
+);
 
 /**
  * @swagger
@@ -66,14 +74,17 @@ router.get("/:buoyId/:tableType/lastone", async (req, res) => {
  */
 
 // Ex:  http://localhost:8088/telemetry/Buoy-620/System/lastday
-router.get("/:buoyId/:tableType/lastday", async (req, res) => {
-  const result = await getRecordsSince(
-    req.params.buoyId,
-    req.params.tableType,
-    1
-  );
-  res.send(result);
-});
+router.get(
+  "/:buoyId/:tableType/lastday",
+  ash(async (req, res) => {
+    const result = await getRecordsSince(
+      req.params.buoyId,
+      req.params.tableType,
+      1
+    );
+    res.send(result);
+  })
+);
 
 /**
  * @swagger
@@ -88,13 +99,16 @@ router.get("/:buoyId/:tableType/lastday", async (req, res) => {
  */
 
 // Ex:  http://localhost:8088/telemetry/Buoy-620/System/lastweek
-router.get("/:buoyId/:tableType/lastweek", async (req, res) => {
-  const result = await getRecordsSince(
-    req.params.buoyId,
-    req.params.tableType,
-    7
-  );
-  res.send(result);
-});
+router.get(
+  "/:buoyId/:tableType/lastweek",
+  ash(async (req, res) => {
+    const result = await getRecordsSince(
+      req.params.buoyId,
+      req.params.tableType,
+      7
+    );
+    res.send(result);
+  })
+);
 
 module.exports = router;
