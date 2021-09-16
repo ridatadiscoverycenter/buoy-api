@@ -14,7 +14,6 @@ aq.addFunction("utcsixhours", (x) => {
 });
 
 // downsample the buoy points to approximately the desired number of points
-// TODO: have this handle multiple buoys in one pass
 const downsample = (data, numPoints, variables) => {
   if (data.length === 0) {
     return data;
@@ -30,8 +29,6 @@ const downsample = (data, numPoints, variables) => {
   if (full_dt.numRows <= numPoints) {
     return full_dt.objects();
   }
-
-  // TODO: what to do with non-numeric values??
 
   let stations = full_dt.groupby("station_name").count().objects();
 

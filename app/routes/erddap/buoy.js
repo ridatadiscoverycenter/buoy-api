@@ -68,9 +68,9 @@ router.get(
     const queryVariables = req.query.variables.split(",");
     const datasetVariables =
       mcache.get(`__express__/erddap/${req.params.source}/variables`) ?? [];
-    const variables = queryVariables.filter((v) =>
-      datasetVariables.includes(v)
-    );
+    const variables = queryVariables
+      .filter((v) => datasetVariables.includes(v))
+      .filter((v) => !v.includes("Qualifiers"));
     if (variables.length === 0) {
       return res.send([]);
     }
