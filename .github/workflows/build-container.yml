@@ -34,7 +34,7 @@ jobs:
         env:
           ENV_FILE: ${{ secrets.ENV_FILE }}
         run: |
-          echo $ENV_FILE | base64 --decode -o .env
+          echo $ENV_FILE | base64 --decode > .env
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
