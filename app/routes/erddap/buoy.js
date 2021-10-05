@@ -63,14 +63,30 @@ router.get(
   "/:source/query",
   ash(async (req, res) => {
     const ids = req.query.ids.split(",");
+    const withUnits = req.query.units === "true" ?? false;
 
     // check variables queried exist for this dataset, short circuit if they don't
     const queryVariables = req.query.variables.split(",");
     const datasetVariables =
-      mcache.get(`__express__/erddap/${req.params.source}/variables`) ?? [];
-    const variables = queryVariables
-      .filter((v) => datasetVariables.includes(v))
-      .filter((v) => !v.includes("Qualifiers"));
+      mcache.get(
+        `__express__/erddap/${req.params.source}/variables${
+          withUnits && "?units=true"
+        }`
+      ) ?? (await common.getVariables(req.datasetId, withUnits));
+
+    let variables;
+    if (withUnits) {
+      variables = queryVariables
+        .filter((v) =>
+          datasetVariables.map((variable) => variable.name).includes(v)
+        )
+        .filter((v) => !v.includes("Qualifiers"));
+    } else {
+      variables = queryVariables
+        .filter((v) => datasetVariables.includes(v))
+        .filter((v) => !v.includes("Qualifiers"));
+    }
+
     if (variables.length === 0) {
       return res.send([]);
     }
@@ -84,6 +100,12 @@ router.get(
     };
 
     let data = await common.queryErddapBuoys(payload, req.query.numPoints);
+
+    if (withUnits) {
+      data.forEach((d) => {
+        d.units = datasetVariables.find((v) => v.name === d.variable).units;
+      });
+    }
     res.send(data);
   })
 );
@@ -143,13 +165,15 @@ router.get(
  *
  */
 
-// Ex:  http://localhost:8080/erddap/buoy/summary
+// Ex:  http://localhost:8080/erddap/buoy/variables
 
 router.get(
   "/:source/variables",
   cacheMiddleware,
   ash(async (req, res) => {
-    res.send(await common.getVariables(req.datasetId));
+    const withUnits = req.query.units === "true" ?? false;
+    const variables = await common.getVariables(req.datasetId, withUnits);
+    res.send(variables);
   })
 );
 

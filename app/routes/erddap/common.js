@@ -78,9 +78,14 @@ const getSummary = async (source) => {
   });
 };
 
-const getVariables = async (datasetId) => {
-  let vars = await getBuoyVariables(datasetId);
-  return vars.sort();
+const getVariables = async (datasetId, withUnits) => {
+  const variables = await getBuoyVariables(datasetId);
+  variables.sort();
+  if (withUnits) {
+    return variables;
+  } else {
+    return variables.map((v) => v.name);
+  }
 };
 
 module.exports = {
