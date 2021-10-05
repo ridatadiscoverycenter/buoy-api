@@ -1,6 +1,5 @@
 const axios = require("axios");
 const utils = require("@/utils");
-const { NetCDFReader } = require("netcdfjs");
 
 const erddapClient = axios.create({
   baseURL:
