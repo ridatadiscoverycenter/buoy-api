@@ -2,7 +2,6 @@ const mcache = require("memory-cache");
 
 const cacheMiddleware = (req, res, next) => {
   let key = "__express__" + req.originalUrl || req.url;
-  console.log(key);
   let timeout = 60 * 60 * 24 * 1000; // one day of milliseconds
   console.log(key);
   let cachedBody = mcache.get(key);
