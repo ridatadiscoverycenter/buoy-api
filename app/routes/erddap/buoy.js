@@ -76,15 +76,15 @@ router.get(
 
     let variables;
     if (withUnits) {
-      variables = queryVariables
-        .filter((v) =>
+      variables = queryVariables.filter(
+        (v) =>
+          !v.includes("Qualifiers") &&
           datasetVariables.map((variable) => variable.name).includes(v)
-        )
-        .filter((v) => !v.includes("Qualifiers"));
+      );
     } else {
-      variables = queryVariables
-        .filter((v) => datasetVariables.includes(v))
-        .filter((v) => !v.includes("Qualifiers"));
+      variables = queryVariables.filter(
+        (v) => !v.includes("Qualifiers") && datasetVariables.includes(v)
+      );
     }
 
     if (variables.length === 0) {

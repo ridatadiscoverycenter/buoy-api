@@ -12,14 +12,9 @@ const erddapClient = axios.create({
   },
 });
 
-const baseVariables = [
-  "time",
-  "latitude",
-  "longitude",
-  "station_name",
-];
+const baseVariables = ["time", "latitude", "longitude", "station_name"];
 
-const nonDataVariables = [...baseVariables, "station_longname", "timezone"]
+const nonDataVariables = [...baseVariables, "station_longname", "timezone"];
 
 const getMultiBuoyGeoJsonData = ({ ids, variables, start, end, datasetId }) => {
   const idString = `~"(${ids.join("|")})"`;
