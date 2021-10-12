@@ -71,7 +71,7 @@ router.get(
       `__express__/erddap/${req.params.source}/variables${
         withUnits && "?units=true"
       }`
-    )
+    );
     let datasetVariables;
     if (cachedVariables) {
       datasetVariables = JSON.parse(cachedVariables);
@@ -83,9 +83,7 @@ router.get(
     if (withUnits) {
       const variableNames = datasetVariables.map((variable) => variable.name);
       variables = queryVariables.filter(
-        (v) =>
-          !v.includes("Qualifiers") &&
-          variableNames.includes(v)
+        (v) => !v.includes("Qualifiers") && variableNames.includes(v)
       );
     } else {
       variables = queryVariables.filter(
