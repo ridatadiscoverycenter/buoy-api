@@ -78,9 +78,13 @@ router.get(
   "/samples",
   cacheMiddleware,
   ash(async (req, res) => {
-    const coordinates =
-      mcache.get("__express__/erddap/da/coordinates") ??
-      (await getCoordinates());
+    const cachedCoordinates = mcache.get("__express__/erddap/da/coordinates");
+    let coordinates;
+    if (cachedCoordinates) {
+      coordinates = JSON.parse(cachedCoordinates);
+    } else {
+      coordinates = await getCoordinates();
+    }
     let data = await getSamples(coordinates);
     res.send(data);
   })
