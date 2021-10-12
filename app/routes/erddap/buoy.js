@@ -67,19 +67,23 @@ router.get(
 
     // check variables queried exist for this dataset, short circuit if they don't
     const queryVariables = req.query.variables.split(",");
-    const datasetVariables =
-      mcache.get(
-        `__express__/erddap/${req.params.source}/variables${
-          withUnits && "?units=true"
-        }`
-      ) ?? (await common.getVariables(req.datasetId, withUnits));
+    const cachedVariables = mcache.get(
+      `__express__/erddap/${req.params.source}/variables${
+        withUnits && "?units=true"
+      }`
+    );
+    let datasetVariables;
+    if (cachedVariables) {
+      datasetVariables = JSON.parse(cachedVariables);
+    } else {
+      datasetVariables = await common.getVariables(req.datasetId, withUnits);
+    }
 
     let variables;
     if (withUnits) {
+      const variableNames = datasetVariables.map((variable) => variable.name);
       variables = queryVariables.filter(
-        (v) =>
-          !v.includes("Qualifiers") &&
-          datasetVariables.map((variable) => variable.name).includes(v)
+        (v) => !v.includes("Qualifiers") && variableNames.includes(v)
       );
     } else {
       variables = queryVariables.filter(
