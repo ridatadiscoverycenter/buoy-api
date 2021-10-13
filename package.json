@@ -28,7 +28,7 @@
     "prettier": "^2.4.1"
   },
   "dependencies": {
-    "arquero": "4",
+    "arquero": "^4.8.7",
     "axios": "^0.21.4",
     "express": "^4.17.1",
     "express-async-handler": "^1.1.4",

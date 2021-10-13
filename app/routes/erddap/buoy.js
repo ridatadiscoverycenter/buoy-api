@@ -92,7 +92,11 @@ router.get(
     }
 
     if (variables.length === 0) {
-      return res.send([]);
+      if (req.query.downsampled === "true") {
+        return res.send({ data: [], downsampled: false });
+      } else {
+        return res.send([]);
+      }
     }
 
     const payload = {
@@ -103,14 +107,21 @@ router.get(
       end: req.query.end,
     };
 
-    let data = await common.queryErddapBuoys(payload, req.query.numPoints);
+    let { data, downsampled } = await common.queryErddapBuoys(
+      payload,
+      req.query.numPoints
+    );
 
     if (withUnits) {
       data.forEach((d) => {
         d.units = datasetVariables.find((v) => v.name === d.variable).units;
       });
     }
-    res.send(data);
+    if (req.query.downsampled === "true") {
+      res.send({ data, downsampled });
+    } else {
+      res.send(data);
+    }
   })
 );
 

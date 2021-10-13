@@ -51,7 +51,13 @@ const queryErddapBuoys = async (payload, rawNumPoints) => {
     return feature.properties;
   });
 
-  return utils.downsample(processed, numPoints, payload.variables);
+  return utils.downsample(
+    processed,
+    numPoints,
+    payload.variables,
+    payload.start,
+    payload.end
+  );
 };
 
 const getBuoyCoordinates = async (datasetId) => {
