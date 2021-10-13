@@ -14,33 +14,51 @@ aq.addFunction("utcsixhours", (x) => {
 });
 
 // downsample the buoy points to approximately the desired number of points
-const downsample = (data, numPoints, variables) => {
+const downsample = (data, numPoints, variables, start, end) => {
   if (data.length === 0) {
     return data;
   }
 
+  const startDate = new Date(start);
+  const endDate = new Date(end);
+
+  const timeInterval = new Date("2020-01-02") - new Date("2020-01-01"); // one day
+  const times = aq.table({
+    time: op.sequence(startDate, endDate, timeInterval),
+  });
+
+  let downsampled = false;
+
   let full_dt = aq
     .from(data)
     .fold(variables, { as: ["variable", "value"] })
-    .filter("d.value")
     .orderby("station_name", "variable", "time")
     .reify();
 
-  if (full_dt.numRows <= numPoints) {
-    return full_dt.objects();
-  }
+  let stations = full_dt.groupby("station_name", "buoyId").count().objects();
 
-  let stations = full_dt.groupby("station_name").count().objects();
-
-  let dsets = stations.map((station) => {
+  let dsets = stations.map(({ station_name, buoyId }) => {
     let vsets = variables.map((v) => {
       let dt = full_dt.filter(
-        `d => d.station_name === "${station.station_name}" && d.variable === "${v}"`
+        `d => d.station_name === "${station_name}" && d.variable === "${v}"`
       );
 
-      if (dt.numRows() < numPoints) {
+      dt = dt
+        .join_full(times, "time")
+        .impute({
+          station_name: `() => "${station_name}"`,
+          variable: `() => "${v}"`,
+          buoyId: `() => "${buoyId}"`,
+          value: () => null,
+        })
+        .orderby("time")
+        .reify();
+
+      if (dt.numRows() <= numPoints) {
         return dt.objects();
       }
+
+      downsampled = true;
 
       // try aggregating to the hour
       let dt_hr = dt
@@ -54,9 +72,10 @@ const downsample = (data, numPoints, variables) => {
             ),
         })
         .groupby("station_name", "variable", "dt_hr")
-        .rollup({ value: op.mean("value") });
+        .rollup({ value: op.mean("value") })
+        .impute({ value: () => null });
 
-      if (dt_hr.numRows() < numPoints) {
+      if (dt_hr.numRows() <= numPoints) {
         return dt_hr
           .select({
             variable: "variable",
@@ -79,9 +98,10 @@ const downsample = (data, numPoints, variables) => {
             ),
         })
         .groupby("station_name", "variable", "dt_qtr")
-        .rollup({ value: op.mean("value") });
+        .rollup({ value: op.mean("value") })
+        .impute({ value: () => null });
 
-      if (dt_qtr.numRows() < numPoints) {
+      if (dt_qtr.numRows() <= numPoints) {
         return dt_qtr
           .select({
             variable: "variable",
@@ -104,6 +124,7 @@ const downsample = (data, numPoints, variables) => {
         })
         .groupby("station_name", "variable", "dt_day")
         .rollup({ value: op.mean("value") })
+        .impute({ value: () => null })
         .select({
           variable: "variable",
           value: "value",
@@ -115,7 +136,7 @@ const downsample = (data, numPoints, variables) => {
     return vsets.reduce((acc, val) => acc.concat(val), []);
   });
 
-  return dsets.reduce((acc, val) => acc.concat(val), []);
+  return { data: dsets.reduce((acc, val) => acc.concat(val), []), downsampled };
 };
 
 const jsonTableToObjects = (table) => {
