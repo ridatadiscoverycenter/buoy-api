@@ -22,6 +22,11 @@ const downsample = (data, numPoints, variables, start, end) => {
   const startDate = new Date(start);
   const endDate = new Date(end);
 
+  const timeInterval = new Date("2020-01-02") - new Date("2020-01-01"); // one day
+  const times = aq.table({
+    time: op.sequence(startDate, endDate, timeInterval),
+  });
+
   let downsampled = false;
 
   let full_dt = aq
@@ -38,18 +43,16 @@ const downsample = (data, numPoints, variables, start, end) => {
         `d => d.station_name === "${station_name}" && d.variable === "${v}"`
       );
 
-      const timeInterval =
-        dt.slice(1, 2).array("time")[0] - dt.slice(0, 1).array("time")[0];
-      const times = aq.table({
-        time: op.sequence(startDate, endDate, timeInterval),
-      });
-
-      dt = dt.join_full(times, "time").impute({
-        station_name: `() => "${station_name}"`,
-        variable: `() => "${v}"`,
-        buoyId: `() => "${buoyId}"`,
-        value: () => null,
-      });
+      dt = dt
+        .join_full(times, "time")
+        .impute({
+          station_name: `() => "${station_name}"`,
+          variable: `() => "${v}"`,
+          buoyId: `() => "${buoyId}"`,
+          value: () => null,
+        })
+        .orderby("time")
+        .reify();
 
       if (dt.numRows() <= numPoints) {
         return dt.objects();
