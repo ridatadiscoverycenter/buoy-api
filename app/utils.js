@@ -15,8 +15,10 @@ aq.addFunction("utcsixhours", (x) => {
 
 // downsample the buoy points to approximately the desired number of points
 const downsample = (data, numPoints, variables, start, end) => {
+  let downsampled = false;
+
   if (data.length === 0) {
-    return data;
+    return { data, downsampled };
   }
 
   const startDate = new Date(start);
@@ -26,8 +28,6 @@ const downsample = (data, numPoints, variables, start, end) => {
   const times = aq.table({
     time: op.sequence(startDate, endDate, timeInterval),
   });
-
-  let downsampled = false;
 
   let full_dt = aq
     .from(data)
