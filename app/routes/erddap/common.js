@@ -18,6 +18,9 @@ const summaryUnitMap = {
   model: "year",
   plankton: "month",
 };
+const downsampleDataset = {
+  plankton: false
+}
 
 const stationMap = {
   bid2: "N. Prudence",
@@ -38,7 +41,7 @@ const stationMap = {
   bid102: "Taunton",
 };
 
-const queryErddapBuoys = async (payload, rawNumPoints) => {
+const queryErddapBuoys = async (payload, rawNumPoints, dataset) => {
   const numPoints = rawNumPoints ?? 1000;
 
   const res = await getMultiBuoyGeoJsonData(payload);
@@ -56,7 +59,8 @@ const queryErddapBuoys = async (payload, rawNumPoints) => {
     numPoints,
     payload.variables,
     payload.start,
-    payload.end
+    payload.end,
+    downsampleDataset[dataset] ?? true
   );
 };
 

@@ -109,7 +109,8 @@ router.get(
 
     let { data, downsampled } = await common.queryErddapBuoys(
       payload,
-      req.query.numPoints
+      req.query.numPoints,
+      req.source
     );
 
     if (withUnits) {

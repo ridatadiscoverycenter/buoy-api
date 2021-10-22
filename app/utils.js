@@ -14,7 +14,7 @@ aq.addFunction("utcsixhours", (x) => {
 });
 
 // downsample the buoy points to approximately the desired number of points
-const downsample = (data, numPoints, variables, start, end) => {
+const downsample = (data, numPoints, variables, start, end, downsampleDataset) => {
   let downsampled = false;
 
   if (data.length === 0) {
@@ -34,6 +34,11 @@ const downsample = (data, numPoints, variables, start, end) => {
     .fold(variables, { as: ["variable", "value"] })
     .orderby("station_name", "variable", "time")
     .reify();
+
+  if (!downsampleDataset) {
+    // a couple datasets are already sparesly sampled, so we bail out early
+    return { data: full_dt.objects(), downsampled: false }
+  }
 
   let stations = full_dt.groupby("station_name", "buoyId").count().objects();
 
