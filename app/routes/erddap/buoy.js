@@ -63,40 +63,21 @@ router.get(
   "/:source/query",
   ash(async (req, res) => {
     const ids = req.query.ids.split(",");
-    const withUnits = req.query.units === "true" ?? false;
 
     // check variables queried exist for this dataset, short circuit if they don't
     const queryVariables = req.query.variables.split(",");
-    const cachedVariables = mcache.get(
-      `__express__/erddap/${req.params.source}/variables${
-        withUnits && "?units=true"
-      }`
-    );
-    let datasetVariables;
-    if (cachedVariables) {
-      datasetVariables = JSON.parse(cachedVariables);
-    } else {
-      datasetVariables = await common.getVariables(req.datasetId, withUnits);
-    }
+    const datasetVariables =
+      mcache.get(`__express__/erddap/${req.params.source}/variables`) ??
+      (await common.getVariables(req.datasetId));
 
     let variables;
-    if (withUnits) {
-      const variableNames = datasetVariables.map((variable) => variable.name);
-      variables = queryVariables.filter(
-        (v) => !v.includes("Qualifiers") && variableNames.includes(v)
-      );
-    } else {
-      variables = queryVariables.filter(
-        (v) => !v.includes("Qualifiers") && datasetVariables.includes(v)
-      );
-    }
+    const variableNames = datasetVariables.map((variable) => variable.name);
+    variables = queryVariables.filter(
+      (v) => !v.includes("Qualifiers") && variableNames.includes(v)
+    );
 
     if (variables.length === 0) {
-      if (req.query.downsampled === "true") {
-        return res.send({ data: [], downsampled: false });
-      } else {
-        return res.send([]);
-      }
+      return res.send({ data: [], downsampled: false });
     }
 
     const payload = {
@@ -113,16 +94,11 @@ router.get(
       req.source
     );
 
-    if (withUnits) {
-      data.forEach((d) => {
-        d.units = datasetVariables.find((v) => v.name === d.variable).units;
-      });
-    }
-    if (req.query.downsampled === "true") {
-      res.send({ data, downsampled });
-    } else {
-      res.send(data);
-    }
+    data.forEach((d) => {
+      d.units = datasetVariables.find((v) => v.name === d.variable).units;
+    });
+
+    res.send({ data, downsampled });
   })
 );
 
@@ -187,8 +163,7 @@ router.get(
   "/:source/variables",
   cacheMiddleware,
   ash(async (req, res) => {
-    const withUnits = req.query.units === "true" ?? false;
-    const variables = await common.getVariables(req.datasetId, withUnits);
+    const variables = await common.getVariables(req.datasetId);
     res.send(variables);
   })
 );

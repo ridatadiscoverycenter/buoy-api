@@ -19,8 +19,8 @@ const summaryUnitMap = {
   plankton: "month",
 };
 const downsampleDataset = {
-  plankton: false
-}
+  plankton: false,
+};
 
 const stationMap = {
   bid2: "N. Prudence",
@@ -88,14 +88,10 @@ const getSummary = async (source) => {
   });
 };
 
-const getVariables = async (datasetId, withUnits) => {
+const getVariables = async (datasetId) => {
   const variables = await getBuoyVariables(datasetId);
   variables.sort();
-  if (withUnits) {
-    return variables;
-  } else {
-    return variables.map((v) => v.name);
-  }
+  return variables;
 };
 
 module.exports = {
