@@ -70,9 +70,8 @@ router.get(
       mcache.get(`__express__/erddap/${req.params.source}/variables`) ??
       (await common.getVariables(req.datasetId));
 
-    let variables;
     const variableNames = datasetVariables.map((variable) => variable.name);
-    variables = queryVariables.filter(
+    const variables = queryVariables.filter(
       (v) => !v.includes("Qualifiers") && variableNames.includes(v)
     );
 
@@ -88,7 +87,7 @@ router.get(
       end: req.query.end,
     };
 
-    let { data, downsampled } = await common.queryErddapBuoys(
+    const { data, downsampled } = await common.queryErddapBuoys(
       payload,
       req.query.numPoints,
       req.source
