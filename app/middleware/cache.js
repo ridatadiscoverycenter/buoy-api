@@ -10,7 +10,10 @@ const cacheMiddleware = (req, res, next) => {
   } else {
     res.sendResponse = res.send;
     res.send = (body) => {
-      mcache.put(key, body, timeout);
+      // sendResponse ends up recursing to here, don't cache the stringified response
+      if (!mcache.get(key)) {
+        mcache.put(key, body, timeout);
+      }
       res.sendResponse(body);
     };
     next();
