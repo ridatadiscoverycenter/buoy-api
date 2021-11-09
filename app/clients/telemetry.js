@@ -1,4 +1,5 @@
 const mysql = require("mysql2");
+var SqlString = require("sqlstring");
 const util = require("util");
 
 const pool = mysql.createPool({
@@ -12,21 +13,46 @@ const pool = mysql.createPool({
 
 const query = util.promisify(pool.query).bind(pool);
 
-const getLatestRecord = async (buoyId, tableType) => {
+const ALL_COLUMNS = ["*"];
+const getColumns = (variables = ALL_COLUMNS) => {
+  // note - this is okay because this code is the only source of variable names - this would
+  // be bad if we allowed user defined variables here
+  return (columns = variables.map((variable) => SqlString.raw(variable)));
+};
+
+const getLatestRecord = async (buoyId, tableType, variables) => {
+  const columns = getColumns(variables);
   return await query(`SELECT * FROM ?? ORDER BY TmStamp desc LIMIT 1`, [
     `${buoyId}_${tableType}`,
   ]);
 };
 
-const getRecordsSince = async (buoyId, tableType, daysAgo) => {
-  // return await query('select timestampadd(DAY, 1, now())')
+const getRecordsSince = async (buoyId, tableType, daysAgo, variables) => {
+  const columns = getColumns(variables);
   return await query(
     `SELECT * FROM ?? WHERE TmStamp >= DATE_SUB(NOW(), interval ? day)`,
     [`${buoyId}_${tableType}`, daysAgo]
   );
 };
 
+const getRecordsRange = async (
+  buoyId,
+  tableType,
+  startDate,
+  endDate,
+  variables
+) => {
+  const columns = getColumns(variables);
+  return await query(`SELECT ? FROM ?? WHERE TmStamp >= ? AND TmStamp < ?`, [
+    columns,
+    `${buoyId}_${tableType}`,
+    startDate,
+    endDate,
+  ]);
+};
+
 module.exports = {
   getLatestRecord,
   getRecordsSince,
+  getRecordsRange,
 };
