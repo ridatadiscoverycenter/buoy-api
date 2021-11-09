@@ -94,10 +94,41 @@ router.param("range", (req, res, next, range) => {
 
 /**
  * @swagger
- * /telemetry/:buoyId/CoreMetrics/:range:
+ * /telemetry/{buoyId}/CoreMetrics/{range}:
  *   get:
  *     description: Get the core metrics telemetry records for this buoy and table type over the requested range
  *     parameters:
+ *       - in: path
+ *         name: buoyId
+ *         required: true
+ *         description: The ID of the buoy to query
+ *         type: string
+ *         enum:
+ *           - Buoy-620
+ *           - Buoy-720
+ *           - Castle_Hill
+ *       - in: path
+ *         name: range
+ *         required: true
+ *         description: The type of date range to query
+ *         type: string
+ *         enum:
+ *           - lastone
+ *           - lastday
+ *           - lastweek
+ *           - range
+ *       - in: query
+ *         name: start
+ *         required: false
+ *         description: The start date of a `range` query
+ *         type: string
+ *         format: date
+ *       - in: query
+ *         name: end
+ *         required: false
+ *         description: The end date of a `range` query. Defaults to the current date if not included.
+ *         type: string
+ *         format: date
  *     responses:
  *       200:
  *         description: Success! New content is now available.
@@ -124,10 +155,59 @@ router.get(
 
 /**
  * @swagger
- * /telemetry/:buoyId/:tableType/:range:
+ * /telemetry/{buoyId}/{tableType}/{range}:
  *   get:
  *     description: Get the telemetry records for this buoy and table type over the requested range
  *     parameters:
+ *       - in: path
+ *         name: buoyId
+ *         required: true
+ *         description: The ID of the buoy to query
+ *         type: string
+ *         enum:
+ *           - Buoy-620
+ *           - Buoy-720
+ *           - Castle_Hill
+ *       - in: path
+ *         name: tableType
+ *         required: true
+ *         description: The table to retrieve data from
+ *         type: string
+ *         enum:
+ *           - Debug
+ *           - ECO
+ *           - GPSData
+ *           - Hydrocat
+ *           - Hydrocycle
+ *           - MetData
+ *           - PAR
+ *           - Power
+ *           - RAS
+ *           - SUNA
+ *           - System
+ *           - gsmInfo
+ *       - in: path
+ *         name: range
+ *         required: true
+ *         description: The type of date range to query
+ *         type: string
+ *         enum:
+ *           - lastone
+ *           - lastday
+ *           - lastweek
+ *           - range
+ *       - in: query
+ *         name: start
+ *         required: false
+ *         description: The start date of a `range` query
+ *         type: string
+ *         format: date
+ *       - in: query
+ *         name: end
+ *         required: false
+ *         description: The end date of a `range` query. Defaults to the current date if not included.
+ *         type: string
+ *         format: date
  *     responses:
  *       200:
  *         description: Success! New content is now available.
