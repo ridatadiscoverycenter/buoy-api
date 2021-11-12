@@ -128,7 +128,7 @@ router.get("/coordinates", (req, res) => {
  * @swagger
  * /erddap/fish/species:
  *   get:
- *     description: Get Fish Trawl Catch Species from ERDDAP
+ *     description: Get Fish Trawl Catch Species and counts from ERDDAP
  *     parameters:
  *     responses:
  *       200:
@@ -166,10 +166,56 @@ router.get(
 
 /**
  * @swagger
- * /erddap/fish/info/:species:
+ * /erddap/fish/info/{species}:
  *   get:
  *     description: Get Fish information for a given species
  *     parameters:
+ *       - in: path
+ *         name: species
+ *         required: true
+ *         description: The fish species to fetch data on
+ *         type: string
+ *         enum:
+ *           - Alewife
+ *           - Atlantic Herring
+ *           - Atlantic Rock Crab
+ *           - Blue Crab
+ *           - Blueback Herring
+ *           - Bluefish
+ *           - Butterfish
+ *           - Conch
+ *           - Cunner
+ *           - Fourspot Flounder
+ *           - Goosefish
+ *           - Gulf Stream Flounder
+ *           - Hermit Crabs
+ *           - Horseshoe Crab
+ *           - Jonah Crab
+ *           - Lady Crab
+ *           - Little Skae
+ *           - Lobster
+ *           - Longfin Squid
+ *           - Longhorn Sculpin
+ *           - Mackerel
+ *           - Mantis Shrimp
+ *           - Menhaden
+ *           - Moonfish
+ *           - Northern Searobin
+ *           - Ocean Pout
+ *           - Red Hake
+ *           - Scup
+ *           - Silver Hake
+ *           - Smooth Dogfish
+ *           - Spider Crabs
+ *           - Spiny Dogfish
+ *           - Spotted Hake
+ *           - Starfish
+ *           - Striped Searobin
+ *           - Summer Flounder
+ *           - Tautog
+ *           - Weakfish
+ *           - Windowpane Flounder
+ *           - Winter Flounder
  *     responses:
  *       200:
  *         description: Success! New content is now available.

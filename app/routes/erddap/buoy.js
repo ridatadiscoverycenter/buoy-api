@@ -22,35 +22,47 @@ router.param("source", (req, res, next, source) => {
 
 /**
  * @swagger
- * /erddap/:source/query:
+ * /erddap/{source}/query:
  *   get:
  *     description: Get Data from ERDDAP
  *     parameters:
- *      - name: ids
- *        in: query
- *        description: Buoy IDs, comma separated
- *        required: true
- *        type: string
- *      - name: variables
- *        in: query
- *        description: Measurement Variables, comma separated
- *        required: true
- *        type: string
- *      - name: start
- *        in: query
- *        description: Start Time
- *        required: true
- *        type: string
- *      - name: end
- *        in: query
- *        description: End Time
- *        required: true
- *        type: string
- *      - name: numPoints
- *        in: query
- *        description: max number of points to return
- *        required: false
- *        type: integer
+ *       - in: path
+ *         name: source
+ *         required: true
+ *         description: The type of buoy data to get
+ *         type: string
+ *         enum:
+ *           - buoy
+ *           - mabuoy
+ *           - model
+ *           - plankton
+ *       - name: ids
+ *         in: query
+ *         description: Buoy IDs, comma separated
+ *         required: true
+ *         type: string
+ *       - name: variables
+ *         in: query
+ *         description: Measurement Variables, comma separated
+ *         required: true
+ *         type: string
+ *       - name: start
+ *         in: query
+ *         description: Start Time
+ *         required: true
+ *         type: string
+ *         format: date
+ *       - name: end
+ *         in: query
+ *         description: End Time
+ *         required: true
+ *         type: string
+ *         format: date
+ *       - name: numPoints
+ *         in: query
+ *         description: max number of points to return
+ *         required: false
+ *         type: integer
  *     responses:
  *       200:
  *         description: Success! New content is now available.
@@ -103,10 +115,20 @@ router.get(
 
 /**
  * @swagger
- * /erddap/:source/coordinates:
+ * /erddap/{source}/coordinates:
  *   get:
  *     description: Get Buoy Coordinates from ERDDAP
  *     parameters:
+ *       - in: path
+ *         name: source
+ *         required: true
+ *         description: The type of buoy data to get
+ *         type: string
+ *         enum:
+ *           - buoy
+ *           - mabuoy
+ *           - model
+ *           - plankton
  *     responses:
  *       200:
  *         description: Success! New content is now available.
@@ -126,9 +148,20 @@ router.get(
 
 /**
  * @swagger
- * /erddap/:source/summary:
+ * /erddap/{source}/summary:
  *   get:
- *     description: Get Buoy Coordinates from ERDDAP
+ *     description: Get data availability summary from ERDDAP
+ *     parameters:
+ *       - in: path
+ *         name: source
+ *         required: true
+ *         description: The type of buoy data to get
+ *         type: string
+ *         enum:
+ *           - buoy
+ *           - mabuoy
+ *           - model
+ *           - plankton
  *     responses:
  *       200:
  *         description: Success! New content is now available.
@@ -147,9 +180,20 @@ router.get(
 
 /**
  * @swagger
- * /erddap/:source/variables:
+ * /erddap/{source}/variables:
  *   get:
  *     description: Get Variables available for this source dataset
+ *     parameters:
+ *       - in: path
+ *         name: source
+ *         required: true
+ *         description: The type of buoy data to get
+ *         type: string
+ *         enum:
+ *           - buoy
+ *           - mabuoy
+ *           - model
+ *           - plankton
  *     responses:
  *       200:
  *         description: Success! New content is now available.
