@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - ci-bke
 
 env:
   REGISTRY: ghcr.io
