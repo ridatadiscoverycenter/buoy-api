@@ -22,7 +22,8 @@ const getColumns = (variables = ALL_COLUMNS) => {
 
 const getLatestRecord = async (buoyId, tableType, variables) => {
   const columns = getColumns(variables);
-  return await query(`SELECT * FROM ?? ORDER BY TmStamp desc LIMIT 1`, [
+  return await query(`SELECT ? FROM ?? ORDER BY TmStamp desc LIMIT 1`, [
+    columns,
     `${buoyId}_${tableType}`,
   ]);
 };
@@ -30,8 +31,8 @@ const getLatestRecord = async (buoyId, tableType, variables) => {
 const getRecordsSince = async (buoyId, tableType, daysAgo, variables) => {
   const columns = getColumns(variables);
   return await query(
-    `SELECT * FROM ?? WHERE TmStamp >= DATE_SUB(NOW(), interval ? day)`,
-    [`${buoyId}_${tableType}`, daysAgo]
+    `SELECT ? FROM ?? WHERE TmStamp >= DATE_SUB(NOW(), interval ? day)`,
+    [columns, `${buoyId}_${tableType}`, daysAgo]
   );
 };
 
