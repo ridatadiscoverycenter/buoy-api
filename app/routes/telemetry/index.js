@@ -49,7 +49,7 @@ const CORE_METRICS = {
     "hydrocatPH",
   ],
   Hydrocycle: ["CAPO4"],
-  SUNA: ["sunaMicroMol"],
+  SUNA: ["sunaNitrateMicroMol"],
   MetData: [
     "avgWindSpeed",
     "avgWindDir",
