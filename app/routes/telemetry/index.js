@@ -72,8 +72,7 @@ const CORE_METRICS = {
     "maximetHumidity",
     "maximetPrecipitation",
     "maximetSolar",
-    "maximetStart",
-  ],
+    "maximetStart"],
   PAR: ["PARcalibrated",
   "parStart"],
 };
