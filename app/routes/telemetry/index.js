@@ -38,7 +38,9 @@ const RANGES = {
   },
 };
 const CORE_METRICS = {
-  ECO: ["ecoReadingRaw", "ecoFDOM"],
+  ECO: ["ecoReadingRaw",
+   "ecoFDOM",
+   "ecoStart"],
   Hydrocat: [
     "hydrocatTemperature",
     "hydrocatConductivity",
@@ -47,9 +49,19 @@ const CORE_METRICS = {
     "hydrocatFluorescence",
     "hydrocatTurbidity",
     "hydrocatPH",
-  ],
-  Hydrocycle: ["CAPO4"],
-  SUNA: ["sunaNitrateMicroMol"],
+    "hydrocatStartTime"],
+  Hydrocycle: [
+  "CAPO4",
+  "QCflag",
+  "Bubbleflag",
+  "COVflag",
+  "Lowsigflag",
+  "OoRflag",
+  "Mixingflag",
+  "Calflag",
+  "Hydrocyclestart"]
+  SUNA: ["sunaNitrateMicroMol",
+  "sunaStart"],
   MetData: [
     "avgWindSpeed",
     "avgWindDir",
