@@ -72,8 +72,10 @@ const CORE_METRICS = {
     "maximetHumidity",
     "maximetPrecipitation",
     "maximetSolar",
+    "maximetStart",
   ],
-  PAR: ["PARcalibrated"],
+  PAR: ["PARcalibrated",
+  "parStart"],
 };
 
 // make sure the url matches tables and buoys we know about
