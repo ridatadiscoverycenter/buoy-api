@@ -48,8 +48,7 @@ const CORE_METRICS = {
     "hydrocatSalinity",
     "hydrocatFluorescence",
     "hydrocatTurbidity",
-    "hydrocatPH",
-    "hydrocatStartTime"],
+    "hydrocatPH"],
   Hydrocycle: [
   "CAPO4",
   "QCflag",
@@ -58,10 +57,8 @@ const CORE_METRICS = {
   "Lowsigflag",
   "OoRflag",
   "Mixingflag",
-  "Calflag",
-  "Hydrocyclestart"]
-  SUNA: ["sunaNitrateMicroMol",
-  "sunaStart"],
+  "Calflag"]
+  SUNA: ["sunaNitrateMicroMol"],
   MetData: [
     "avgWindSpeed",
     "avgWindDir",
@@ -71,10 +68,8 @@ const CORE_METRICS = {
     "maximetPressure",
     "maximetHumidity",
     "maximetPrecipitation",
-    "maximetSolar",
-    "maximetStart"],
-  PAR: ["PARcalibrated",
-  "parStart"],
+    "maximetSolar"],
+  PAR: ["PARcalibrated"],
 };
 
 // make sure the url matches tables and buoys we know about
@@ -157,6 +152,7 @@ router.get(
       Object.entries(CORE_METRICS).map(async ([table, vars]) => ({
         [table]: await req.queryFn(req.params.buoyId, table, [
           "TmStamp",
+          `${table.toLowerCase()}Start`,
           ...vars,
         ]),
       }))
