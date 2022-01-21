@@ -48,7 +48,16 @@ const CORE_METRICS = {
     "hydrocatTurbidity",
     "hydrocatPH",
   ],
-  Hydrocycle: ["CAPO4"],
+  Hydrocycle: [
+    "CAPO4",
+    "QCflag",
+    "Bubbleflag",
+    "COVflag",
+    "Lowsigflag",
+    "OoRflag",
+    "Mixingflag",
+    "Calflag",
+  ],
   SUNA: ["sunaNitrateMicroMol"],
   MetData: [
     "avgWindSpeed",
@@ -144,6 +153,7 @@ router.get(
       Object.entries(CORE_METRICS).map(async ([table, vars]) => ({
         [table]: await req.queryFn(req.params.buoyId, table, [
           "TmStamp",
+          `${table.toLowerCase()}Start`,
           ...vars,
         ]),
       }))
