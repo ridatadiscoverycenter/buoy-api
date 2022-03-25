@@ -15,7 +15,9 @@ router.param("source", (req, res, next, source) => {
     next();
   } else {
     next(
-      new Error("unknown erddap source, only buoy, model or plankton allowed")
+      new Error(
+        "unknown erddap source, only buoy, telemetry-raw, model or plankton allowed"
+      )
     );
   }
 });
@@ -174,7 +176,8 @@ router.get(
   "/:source/summary",
   cacheMiddleware,
   ash(async (req, res) => {
-    res.send(await common.getSummary(req.params.source));
+    const summary = await common.getSummary(req.params.source);
+    res.send(summary);
   })
 );
 
