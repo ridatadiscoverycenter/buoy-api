@@ -176,8 +176,7 @@ router.get(
   "/:source/summary",
   cacheMiddleware,
   ash(async (req, res) => {
-    const summary = await common.getSummary(req.params.source);
-    res.send(summary);
+    res.send(await common.getSummary(req.params.source));
   })
 );
 

@@ -41,6 +41,8 @@ const stationMap = {
   bid21: "Station II",
   bid101: "Cole",
   bid102: "Taunton",
+
+  // TODO: waiting for proper name mappings on the telemetry buoys
   "Buoy-720": "Buoy 720",
   "Buoy-620": "Buoy 620",
   Castle_Hill: "Castle Hill",
