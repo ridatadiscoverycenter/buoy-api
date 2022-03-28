@@ -15,7 +15,9 @@ router.param("source", (req, res, next, source) => {
     next();
   } else {
     next(
-      new Error("unknown erddap source, only buoy, model or plankton allowed")
+      new Error(
+        "unknown erddap source, only buoy, telemetry-raw, model or plankton allowed"
+      )
     );
   }
 });

@@ -11,12 +11,14 @@ const datasetMap = {
   mabuoy: "ma_buoy_data_a6c9_12eb_1ec5",
   model: "model_data_77bb_15c2_6ab3",
   plankton: "plankton_time_series_7615_c513_ef8e",
+  "telemetry-raw": "buoy_telemetry_0ffe_2dc0_916e",
 };
 const summaryUnitMap = {
   buoy: "month",
   mabuoy: "month",
   model: "year",
   plankton: "month",
+  "telemetry-raw": "day",
 };
 const downsampleDataset = {
   plankton: false,
@@ -39,6 +41,11 @@ const stationMap = {
   bid21: "Station II",
   bid101: "Cole",
   bid102: "Taunton",
+
+  // TODO: waiting for proper name mappings on the telemetry buoys
+  "Buoy-720": "Buoy 720",
+  "Buoy-620": "Buoy 620",
+  Castle_Hill: "Castle Hill",
 };
 
 const queryErddapBuoys = async (payload, rawNumPoints, dataset) => {
