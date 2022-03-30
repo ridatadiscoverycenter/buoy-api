@@ -110,6 +110,14 @@ const getBuoyVariables = async (datasetId) => {
   }));
 };
 
+const getBuoyTimeRange = async (datasetId) => {
+  const jsonRes = await erddapClient.get(
+    `/${datasetId}.json?time&orderByMinMax("time")`
+  );
+  const res = utils.jsonTableToObjects(jsonRes.data.table);
+  return { min: res[0].time, max: res[1].time };
+};
+
 const getDAData = async ({ sites, datasetId }) => {
   const siteString = `~"(${sites.join("|")})"`;
   const res = await erddapClient.get(
@@ -131,6 +139,7 @@ module.exports = {
   getBuoysCoordinates,
   getBuoyVariables,
   getSummaryData,
+  getBuoyTimeRange,
   getDAData,
   getFishData,
 };
