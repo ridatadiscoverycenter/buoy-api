@@ -3,6 +3,7 @@ const router = express.Router();
 const ash = require("express-async-handler");
 const utils = require("@/utils");
 const common = require("@/routes/erddap/common");
+const { getBuoyTimeRange } = require("@/clients/erddap");
 const { cacheMiddleware } = require("@/middleware/cache");
 const mcache = require("memory-cache");
 
@@ -210,6 +211,15 @@ router.get(
   ash(async (req, res) => {
     const variables = await common.getVariables(req.datasetId);
     res.send(variables);
+  })
+);
+
+router.get(
+  "/:source/timerange",
+  cacheMiddleware,
+  ash(async (req, res) => {
+    const range = await getBuoyTimeRange(req.datasetId);
+    res.send(range);
   })
 );
 
