@@ -39,6 +39,7 @@ router.param("source", (req, res, next, source) => {
  *           - mabuoy
  *           - model
  *           - plankton
+ *           - telemetry-raw
  *       - name: ids
  *         in: query
  *         description: Buoy IDs, comma separated
@@ -132,6 +133,7 @@ router.get(
  *           - mabuoy
  *           - model
  *           - plankton
+ *           - telemetry-raw
  *     responses:
  *       200:
  *         description: Success! New content is now available.
@@ -165,6 +167,7 @@ router.get(
  *           - mabuoy
  *           - model
  *           - plankton
+ *           - telemetry-raw
  *     responses:
  *       200:
  *         description: Success! New content is now available.
@@ -197,6 +200,7 @@ router.get(
  *           - mabuoy
  *           - model
  *           - plankton
+ *           - telemetry-raw
  *     responses:
  *       200:
  *         description: Success! New content is now available.
