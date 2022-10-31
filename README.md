@@ -32,13 +32,6 @@ BUOY_TELEMETRY_MYSQL_DATABASE=buoy_telemetry
 
 The built/deployed version uses the `.env` file with the same keys but with the service account.
 
-## Restarting Production API
+## Production Deployment
 
-After changes or updates to the servers, the BKE cluster needs to be restarted.
-
-•	`kubectl get deployments` should return `riddc-api`
-•   `kubectl get pods` should show the age of the last restart
-•	`kubectl rollout restart deployment/riddc-api`
-•	`kubectl describe pod [pod name]` – gets info on the deployment
-
-See https://github.com/brown-ccv/k8s-deploy-bke/tree/main/riddc-api
+The deployment lives on the BKE cluster `bkpd-rancher`. See https://github.com/brown-ccv/k8s-deploy-bke/tree/main/riddc-api for more info on the deployment and troubleshooting.
