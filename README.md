@@ -31,3 +31,7 @@ BUOY_TELEMETRY_MYSQL_DATABASE=buoy_telemetry
 ```
 
 The built/deployed version uses the `.env` file with the same keys but with the service account.
+
+## Production Deployment
+
+The deployment lives on the BKE cluster `bkpd-rancher`. See https://github.com/brown-ccv/k8s-deploy-bke/tree/main/riddc-api for more info on the deployment and troubleshooting.
