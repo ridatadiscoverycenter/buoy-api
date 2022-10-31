@@ -12,7 +12,7 @@ const port = 8088;
 
 const specs = swaggerJsdoc(swaggerOptions);
 
-app.use(logger("dev"));
+app.use(logger("[:date[web]] :method :url :status :res[content-length] - :remote-addr - :response-time ms"));
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "*");
