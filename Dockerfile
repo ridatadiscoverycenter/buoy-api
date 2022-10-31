@@ -8,6 +8,8 @@ COPY package.json .
 COPY package-lock.json .
 
 RUN npm install
+RUN yum install systemd
+RUN sudo timedatectl set-timezone America/New_York
 
 COPY . .
 
