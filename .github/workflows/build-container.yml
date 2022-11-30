@@ -2,6 +2,9 @@
 
 name: Build and Push Buoy API Container
 on:
+  pull_request:
+    branches:
+      - main
   push:
     branches:
       - main
@@ -36,8 +39,6 @@ jobs:
         uses: docker/metadata-action@v3
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=semver,pattern={{raw}},value=v${{ env.VERSION }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
