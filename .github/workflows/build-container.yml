@@ -2,9 +2,14 @@
 
 name: Build and Push Buoy API Container
 on:
+  pull_request:
+    branches:
+      - main
   push:
     branches:
       - main
+    tags:
+      - '*'
 
 env:
   REGISTRY: ghcr.io
@@ -34,7 +39,6 @@ jobs:
         uses: docker/metadata-action@v3
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: latest
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
