@@ -6,17 +6,16 @@ To install:
 `npm install`
 
 To run:
-`npm run start`
-`npm run dev` (if trying to connect to a local erddap instance, use `npm run dev:local` instead)
-
-Linting:
-`npm run prettify`
+`npm run dev` (if trying to connect to a local telemetry or erddap instance, use `npm run dev:telemetry:local` or `npm run dev:erddap:local`, respectively)
 
 Listening on:
 `localhost:8088`
 
 Documentation:
 `localhost:8088/api-docs`
+
+Linting:
+`npm run prettify`
 
 
 ## Buoy Telemetry
