@@ -4,7 +4,7 @@ const utils = require("@/utils");
 const erddapClient = axios.create({
   baseURL:
     process.env.BUOY_API_ERDDAP_URL ??
-    "https://qa-erddap.riddc.brown.edu/erddap/tabledap",
+    "https://erddap.riddc.brown.edu/erddap/tabledap",
   withCredentials: false,
   headers: {
     Accept: "application/json",
