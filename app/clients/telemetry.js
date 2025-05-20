@@ -1,7 +1,8 @@
+throw new Error(`Hello`);
+
 const mysql = require("mysql2");
 var SqlString = require("sqlstring");
 const util = require("util");
-throw new Error(`Hello`);
 
 const pool = mysql.createPool({
   connectionLimit: 10,
