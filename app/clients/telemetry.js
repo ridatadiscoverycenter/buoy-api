@@ -17,13 +17,8 @@ const ALL_COLUMNS = ["*"];
 const getColumns = (variables = ALL_COLUMNS) => {
   // note - this is okay because this code is the only source of variable names - this would
   // be bad if we allowed user defined variables here
-  try {
   var cols = (columns = variables.map((variable) => SqlString.raw(variable)));
-  console.log(cols);
-  } catch (error) {
-    console.error(error);
-    throw new Error(`Unable to get columns.`);
-  }
+  throw new Error(`Columns: ${JSON.stringify(cols)}`);
 };
 
 const getLatestRecord = async (buoyId, tableType, variables) => {
