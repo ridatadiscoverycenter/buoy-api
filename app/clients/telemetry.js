@@ -1,5 +1,3 @@
-throw new Error(`Hello`);
-
 const mysql = require("mysql2");
 var SqlString = require("sqlstring");
 const util = require("util");
@@ -17,20 +15,17 @@ const query = util.promisify(pool.query).bind(pool);
 
 const ALL_COLUMNS = ["*"];
 const getColumns = (variables = ALL_COLUMNS) => {
-  // note - this is okay because this code is the only source of variable names - this would
-  // be bad if we allowed user defined variables here
-  var cols = (columns = variables.map((variable) => SqlString.raw(variable)));
-  throw new Error(`Columns: ${JSON.stringify(cols)}`);
+  return variables.map((variable) => SqlString.raw(variable)).join(', ');
 };
 
 const getLatestRecord = async (buoyId, tableType, variables) => {
   const columns = getColumns(variables);
+  const tableName = SqlString.escapeId(`${buoyId}_${tableType}`);
+  
   try {
-    var result = await query(`SELECT ? FROM ?? ORDER BY TmStamp desc LIMIT 1`, [
-    columns,
-    `${buoyId}_${tableType}`,
-  ]);
+    var result = await query(`SELECT ${columns} FROM ${tableName} ORDER BY TmStamp desc LIMIT 1`);
     console.log(result);
+    return result;
   } catch (error) {
     console.error(error);
     throw new Error(`Unable to retrieve latest ${tableType} record for buoy ${buoyId}.`);
@@ -39,9 +34,11 @@ const getLatestRecord = async (buoyId, tableType, variables) => {
 
 const getRecordsSince = async (buoyId, tableType, daysAgo, variables) => {
   const columns = getColumns(variables);
+  const tableName = SqlString.escapeId(`${buoyId}_${tableType}`);
+  
   return await query(
-    `SELECT ? FROM ?? WHERE TmStamp >= DATE_SUB(NOW(), interval ? day)`,
-    [columns, `${buoyId}_${tableType}`, daysAgo]
+    `SELECT ${columns} FROM ${tableName} WHERE TmStamp >= DATE_SUB(NOW(), interval ? day)`,
+    [daysAgo]
   );
 };
 
@@ -53,9 +50,9 @@ const getRecordsRange = async (
   variables
 ) => {
   const columns = getColumns(variables);
-  return await query(`SELECT ? FROM ?? WHERE TmStamp >= ? AND TmStamp < ?`, [
-    columns,
-    `${buoyId}_${tableType}`,
+  const tableName = SqlString.escapeId(`${buoyId}_${tableType}`);
+  
+  return await query(`SELECT ${columns} FROM ${tableName} WHERE TmStamp >= ? AND TmStamp < ?`, [
     startDate,
     endDate,
   ]);
