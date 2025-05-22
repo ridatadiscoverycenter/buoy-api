@@ -1,4 +1,5 @@
 require("module-alias/register");
+fs = require('fs');
 const express = require("express");
 const logger = require("morgan");
 const createError = require("http-errors");
