@@ -13,7 +13,7 @@ const port = 8088;
 
 //set up the logger
 var accessLogStream = fs.createWriteStream(__dirname + '/access.log', {flags: 'a'})
-app.use(morgan('combined',  {"stream": accessLogStream}));
+app.use(logger('combined',  {"stream": accessLogStream}));
 const specs = swaggerJsdoc(swaggerOptions);
 
 app.use(logger("[:date[web]] :method :url :status :res[content-length] - :remote-addr - :response-time ms"));
