@@ -5,7 +5,6 @@ const fish = require("@/routes/erddap/fish");
 const mcache = require("memory-cache");
 
 const updateCache = async (timeout) => {
-  console.log({env:process.env})
   const end = new Date().toISOString(); // now
   const keyBase = "__express__/erddap";
   Object.entries(common.datasetMap).map(async ([src, datasetId]) => {
