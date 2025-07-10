@@ -48,7 +48,6 @@ const getSamples = async (coordinates) => {
  * /erddap/da/coordinates:
  *   get:
  *     description: Get Domoic Acid Sample Locations ERDDAP
- *     parameters:
  *     responses:
  *       200:
  *         description: Success! New content is now available.
@@ -68,7 +67,6 @@ router.get(
  * /erddap/da/samples:
  *   get:
  *     description: Get Domoic Acid Samples from ERDDAP
- *     parameters:
  *     responses:
  *       200:
  *         description: Success! New content is now available.
