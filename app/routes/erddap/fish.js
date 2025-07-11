@@ -114,7 +114,6 @@ const getMonthlyTemps = (temps) => {
  * /erddap/fish/coordinates:
  *   get:
  *     description: Get Fish Trawl Survey Locations ERDDAP
- *     parameters:
  *     responses:
  *       200:
  *         description: Success! New content is now available.
@@ -129,7 +128,6 @@ router.get("/coordinates", (req, res) => {
  * /erddap/fish/species:
  *   get:
  *     description: Get Fish Trawl Catch Species and counts from ERDDAP
- *     parameters:
  *     responses:
  *       200:
  *         description: Success! New content is now available.
@@ -149,7 +147,6 @@ router.get(
  * /erddap/fish/temps:
  *   get:
  *     description: Get Fish Trawl Survey Water Temps from ERDDAP
- *     parameters:
  *     responses:
  *       200:
  *         description: Success! New content is now available.
