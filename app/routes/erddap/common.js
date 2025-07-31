@@ -9,7 +9,7 @@ const utils = require("@/utils");
 const datasetMap = {
   buoy: "combined_e784_bee5_492e",
   mabuoy: "ma_buoy_data_a6c9_12eb_1ec5",
-  model: "model_data_77bb_15c2_6ab3",
+  model: "osom_v2_0585_f867_db94",
   plankton: "plankton_time_series_7615_c513_ef8e",
   "telemetry-raw": "buoy_telemetry_0ffe_2dc0_916e",
 };
