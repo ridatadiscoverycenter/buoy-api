@@ -33,7 +33,7 @@ const getLatestRecord = async (table, timestampVar, variables) => {
 const getRecordsSince = async (table, timestampVar, daysAgo, variables) => {
   const columns = getColumns(variables);
   return await query(
-    `SELECT ? FROM ?? WHERE ? >= DATE_SUB(NOW(), interval ? day)`,
+    `SELECT ? FROM ?? WHERE ?? >= DATE_SUB(NOW(), interval ? day)`,
     [columns, table, timestampVar, daysAgo]
   );
 };

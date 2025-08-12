@@ -8,6 +8,10 @@ const {
   getRecordsRange,
 } = require("@/clients/breathepvd.js");
 
+const getTimestampVar = (table) => {
+    return table === "sensordata" ? "local_timestamp" : "timestamp_local"
+}
+
 const RANGES = {
   lastone: () => (table, timestampVar, variables) =>
     getLatestRecord(table, timestampVar, variables),
@@ -81,7 +85,7 @@ router.get(
   ash(async (req, res) => {
     const result = await req.queryFn(
       req.params.table,
-      req.params.timestampVar
+      getTimestampVar(req.params.table)
     );
     res.send(result);
   })
