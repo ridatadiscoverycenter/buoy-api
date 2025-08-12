@@ -1,6 +1,7 @@
 .env
 .env.*
 node_modules
+app/access.log
 content
 out
 yarn-error.log
