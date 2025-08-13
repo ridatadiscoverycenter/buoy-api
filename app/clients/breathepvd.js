@@ -20,35 +20,47 @@ const getColumns = (variables = ALL_COLUMNS) => {
   return (columns = variables.map((variable) => SqlString.raw(variable)));
 };
 
-const getLatestRecord = async (table, timestampVar, variables) => {
+const getLatestRecord = async (sensor, table, timestampVar, variables) => {
   const columns = getColumns(variables);
   // TO_REVIEW: do i need to only get certain buoy?
   return await query(`SELECT ? FROM ?? ORDER BY ? desc LIMIT 1`, [
     columns,
-    table,
+    `${sensor}_${table}`,
     timestampVar,
   ]);
 };
 
-const getRecordsSince = async (table, timestampVar, daysAgo, variables) => {
+const getRecordsSince = async (
+  sensor,
+  table,
+  timestampVar,
+  daysAgo,
+  variables
+) => {
   const columns = getColumns(variables);
   return await query(
     `SELECT ? FROM ?? WHERE ?? >= DATE_SUB(NOW(), interval ? day)`,
-    [columns, table, timestampVar, daysAgo]
+    [columns, `${sensor}_${table}`, timestampVar, daysAgo]
   );
 };
 
 const getRecordsRange = async (
+  sensor,
   table,
   timestampVar,
   startDate,
   endDate,
   variables
 ) => {
-    const columns = getColumns(variables);
-    return await query(`SELECT ? FROM ?? WHERE ? >= ? and ? < ?`,
-        [columns, table, timestampVar, startDate, timestampVar, endDate]
-    )
+  const columns = getColumns(variables);
+  return await query(`SELECT ? FROM ?? WHERE ? >= ? and ? < ?`, [
+    columns,
+    `${table}_${sensor}`,
+    timestampVar,
+    startDate,
+    timestampVar,
+    endDate,
+  ]);
 };
 
 module.exports = {
