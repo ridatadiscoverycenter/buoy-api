@@ -35,7 +35,6 @@ const breathePvdRouter = require("./routes/breathepvd/index");
 app.use("/breathepvd", breathePvdRouter);
 
 // initialize cache and set timer to update it every day
-// TODO do we need to make a separate, shorter update for breathepvd?
 const cacheTimeout = 60 * 60 * 24 * 1000; // one day of milliseconds
 updateCache(cacheTimeout);
 // start refreshing 10 seconds before timeout

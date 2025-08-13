@@ -22,7 +22,6 @@ const getColumns = (variables = ALL_COLUMNS) => {
 
 const getLatestRecord = async (sensor, table, timestampVar, variables) => {
   const columns = getColumns(variables);
-  // TO_REVIEW: do i need to only get certain buoy?
   return await query(`SELECT ? FROM ?? ORDER BY ? desc LIMIT 1`, [
     columns,
     `${sensor}_${table}`,
