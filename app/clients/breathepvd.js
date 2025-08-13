@@ -53,9 +53,9 @@ const getRecordsRange = async (
   variables
 ) => {
   const columns = getColumns(variables);
-  return await query(`SELECT ? FROM ?? WHERE ? >= ? and ? < ?`, [
+  return await query(`SELECT ? FROM ?? WHERE ?? >= ? and ?? < ?`, [
     columns,
-    `${table}_${sensor}`,
+    `${sensor}_${table}`,
     timestampVar,
     startDate,
     timestampVar,

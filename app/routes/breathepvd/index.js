@@ -9,29 +9,29 @@ const {
 } = require("@/clients/breathepvd.js");
 
 SENSOR_IDS = [
-  "Bs12202",
-  "Bs22202",
-  "Bs32202",
-  "Bs42202",
-  "Bs52202",
-  "Bs62202",
-  "Bs72202",
-  "Bs82202",
-  "Bs92202",
-  "Bs102202",
-  "Bs112202",
-  "Bs122202",
-  "Bs132202",
-  "Bs142202",
-  "Bs152202",
-  "Bs162202",
-  "Bs192202",
-  "Bs172202",
-  "Bs182202",
-  "Bs232202",
-  "Bs242202",
-  "Bs212202",
-  "Bs222202",
+  "250",
+  "254",
+  "258",
+  "261",
+  "264",
+  "267",
+  "270",
+  "274",
+  "276",
+  "251",
+  "252",
+  "255",
+  "257",
+  "259",
+  "262",
+  "263",
+  "272",
+  "266",
+  "269",
+  "265",
+  "268",
+  "256",
+  "260",
 ];
 PM_IDS = ["00810", "00811", "00812"];
 
@@ -49,7 +49,7 @@ const RANGES = {
   range: (req) => {
     const startDate = new Date(req.query.start);
     const endDate = req.query.end ? new Date(req.query.end) : new Date();
-    return getRecordsRange(
+    return (sensor, table, timestampVar, variables) => getRecordsRange(
       sensor,
       table,
       timestampVar,
@@ -63,7 +63,6 @@ const RANGES = {
 // make sure the url matches sensors we know about
 
 router.param("range", (req, res, next, range) => {
-    console.log(req)
   const queryFn = RANGES[range];
   if (queryFn) {
     req.queryFn = queryFn(req);
@@ -73,18 +72,19 @@ router.param("range", (req, res, next, range) => {
   }
 });
 
+// swagger for QuantAQ PM data
 /**
  * @swagger
  * /breathepvd/pm/{sensor_id}/{range}:
  *   get:
  *     description: Get the BreathePVD records for this buoy and table type over the requested range
- *     parameters:   
+ *     parameters:
  *       - in: path
  *         name: sensor_id
  *         required: true
  *         description: Data source
  *         type: string
- *         enum: 
+ *         enum:
  *           - '00810'
  *           - '00811'
  *           - '00812'
@@ -123,6 +123,84 @@ router.get(
     const result = await req.queryFn(
       req.params.table,
       req.params.sensor_id,
+      getTimestampVar(req.params.table)
+    );
+    res.send(result);
+  })
+);
+
+// Swagger route for sensor data
+/**
+ * @swagger
+ * /breathepvd/sensor/{sensor}/{range}:
+ *   get:
+ *     description: Get the BreathePVD records for this buoy and table type over the requested range
+ *     parameters:
+ *       - in: path
+ *         name: sensor
+ *         required: true
+ *         description: The ID of the sensor to query
+ *         type: string
+ *         enum:
+ *           - '250'
+ *           - '254'
+ *           - '258'
+ *           - '261'
+ *           - '264'
+ *           - '267'
+ *           - '270'
+ *           - '274'
+ *           - '276'
+ *           - '251'
+ *           - '252'
+ *           - '255'
+ *           - '257'
+ *           - '259'
+ *           - '262'
+ *           - '263'
+ *           - '272'
+ *           - '266'
+ *           - '269'
+ *           - '265'
+ *           - '268'
+ *           - '256'
+ *           - '260'
+ *       - in: path
+ *         name: range
+ *         required: true
+ *         description: The type of date range to query
+ *         type: string
+ *         enum:
+ *           - lastone
+ *           - lastday
+ *           - lastweek
+ *           - range
+ *       - in: query
+ *         name: start
+ *         required: false
+ *         description: The start date of a `range` query
+ *         type: string
+ *         format: date
+ *       - in: query
+ *         name: end
+ *         required: false
+ *         description: The end date of a `range` query. Defaults to the current date if not included.
+ *         type: string
+ *         format: date
+ *     responses:
+ *       200:
+ *         description: Success! New content is now available.
+ *
+ */
+
+// Ex:  http://localhost:8088/breathepvd/sensor/Bs152202/lastone
+router.get(
+  "/:table/:sensor_id/:range",
+  ash(async (req, res) => {
+    console.log({req})
+    const result = await req.queryFn(
+      req.params.table,
+      req.params.sensor,
       getTimestampVar(req.params.table)
     );
     res.send(result);
