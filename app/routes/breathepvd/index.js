@@ -197,7 +197,6 @@ router.get(
 router.get(
   "/:table/:sensor_id/:range",
   ash(async (req, res) => {
-    console.log({req})
     const result = await req.queryFn(
       req.params.table,
       req.params.sensor,
