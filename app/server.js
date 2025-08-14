@@ -31,6 +31,9 @@ app.use("/erddap", erddapRouter);
 const telemetryRouter = require("./routes/telemetry/index");
 app.use("/telemetry", telemetryRouter);
 
+const breathePvdRouter = require("./routes/breathepvd/index");
+app.use("/breathepvd", breathePvdRouter);
+
 // initialize cache and set timer to update it every day
 const cacheTimeout = 60 * 60 * 24 * 1000; // one day of milliseconds
 updateCache(cacheTimeout);
