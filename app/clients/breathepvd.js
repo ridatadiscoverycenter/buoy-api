@@ -22,7 +22,7 @@ const getColumns = (variables = ALL_COLUMNS) => {
 
 const getLatestRecord = async (sensor, table, timestampVar, variables) => {
   const columns = getColumns(variables);
-  return await query(`SELECT ? FROM ?? ORDER BY ? desc LIMIT 1`, [
+  return await query(`SELECT ? FROM ?? ORDER BY ?? desc LIMIT 1`, [
     columns,
     `${sensor}_${table}`,
     timestampVar,
