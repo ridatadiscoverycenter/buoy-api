@@ -186,6 +186,39 @@ router.get(
 
 /**
  * @swagger
+ * /erddap/{source}/summary-mean:
+ *   get:
+ *     description: Get mean value per month from ERDDAP
+ *     parameters:
+ *       - in: path
+ *         name: source
+ *         required: true
+ *         description: The type of buoy data to get
+ *         type: string
+ *         enum:
+ *           - buoy
+ *           - mabuoy
+ *           - model
+ *           - plankton
+ *           - telemetry-raw
+ *     responses:
+ *       200:
+ *         description: Success! New content is now available.
+ *
+ */
+
+// Ex:  http://localhost:8080/erddap/buoy/summary-mean
+
+router.get(
+  "/:source/summary-mean",
+  cacheMiddleware,
+  ash(async (req, res) => {
+    res.send(await common.getSummaryMean(req.params.source));
+  })
+);
+
+/**
+ * @swagger
  * /erddap/{source}/variables:
  *   get:
  *     description: Get Variables available for this source dataset

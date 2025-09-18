@@ -3,6 +3,7 @@ const {
   getBuoysCoordinates,
   getBuoyVariables,
   getSummaryData,
+  getSummaryMeanData,
 } = require("@/clients/erddap");
 const utils = require("@/utils");
 
@@ -95,6 +96,21 @@ const getSummary = async (source) => {
   });
 };
 
+const getSummaryMean = async (source) => {
+  const datasetId = datasetMap[source];
+  const variables = await getBuoyVariables(datasetId);
+  const res = await getSummaryMeanData(
+    datasetId,
+    variables,
+    summaryUnitMap[source]
+  );
+  return res.map((row) => {
+    row.buoyId = row.station_name;
+    row.station_name = `${stationMap[row.buoyId]} (${row.buoyId})`;
+    return row;
+  });
+};
+
 const getVariables = async (datasetId) => {
   const variables = await getBuoyVariables(datasetId);
   variables.sort();
@@ -105,6 +121,7 @@ module.exports = {
   queryErddapBuoys,
   getBuoyCoordinates,
   getSummary,
+  getSummaryMean,
   getVariables,
   stationMap,
   datasetMap,
