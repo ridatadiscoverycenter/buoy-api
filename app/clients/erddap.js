@@ -70,6 +70,17 @@ const getSummaryData = async (datasetId, variables, timeUnit) => {
   return utils.jsonTableToObjects(res.data.table);
 };
 
+const getSummaryMeanData = async (datasetId, variables, timeUnit) => {
+  const res = await erddapClient.get(
+    `/${datasetId}.json?${variables
+      .map((v) => v.name)
+      .join(
+        ","
+      )},station_name,time&orderByMean("station_name,time/${timeUnit}")`
+  );
+  return utils.jsonTableToObjects(res.data.table);
+};
+
 const getBuoysCoordinates = async (datasetId) => {
   const res = await erddapClient.get(
     `/${datasetId}.json?station_name,longitude,latitude&distinct()`
@@ -139,6 +150,7 @@ module.exports = {
   getBuoysCoordinates,
   getBuoyVariables,
   getSummaryData,
+  getSummaryMeanData,
   getBuoyTimeRange,
   getDAData,
   getFishData,
