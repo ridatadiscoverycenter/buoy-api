@@ -19,6 +19,13 @@ const getColumns = (variables = ALL_COLUMNS) => {
   // be bad if we allowed user defined variables here
   return (columns = variables.map((variable) => SqlString.raw(variable)));
 };
+const getAvgColumns = (variables) => {
+  // note - this is okay because this code is the only source of variable names - this would
+  // be bad if we allowed user defined variables here
+    return (columns = variables.map((variable) =>
+      SqlString.raw(`AVG( ${variable} ) as ${variable}`)
+    ));
+};
 
 const getLatestRecord = async (sensor, table, timestampVar, variables) => {
   const columns = getColumns(variables);
@@ -62,8 +69,34 @@ const getRecordsRange = async (
   ]);
 };
 
+const getHourlyRecordsRange = async (
+  sensor,
+  table,
+  timestampVar,
+  startDate,
+  endDate,
+  variables
+) => {
+  const columns = getAvgColumns(variables);
+  return await query(
+    `SELECT TIMESTAMP(SUBSTRING( ??, 1, 13 )) AS hour , ?
+      FROM ??
+      WHERE ?? >= ? and ?? < ?
+      GROUP BY hour`,
+    [
+      timestampVar,
+      columns,
+      `${sensor}_${table}`,
+      timestampVar,
+      startDate,
+      timestampVar,
+      endDate,
+    ]
+  );
+};
 module.exports = {
   getLatestRecord,
   getRecordsSince,
   getRecordsRange,
+  getHourlyRecordsRange,
 };
