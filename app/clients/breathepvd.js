@@ -79,10 +79,10 @@ const getHourlyRecordsRange = async (
 ) => {
   const columns = getAvgColumns(variables);
   return await query(
-    `SELECT TIMESTAMP(SUBSTRING( ??, 1, 13 )) AS hour , ?
-      FROM ??
-      WHERE ?? >= ? and ?? < ?
-      GROUP BY hour`,
+    `SELECT MIN( ?? ) as timestamp, ?
+    FROM ?? 
+    WHERE ?? >= ? and ?? < ?
+    GROUP BY date_format(timestamp, '%Y-%m-%d %H')`,
     [
       timestampVar,
       columns,
@@ -91,6 +91,7 @@ const getHourlyRecordsRange = async (
       startDate,
       timestampVar,
       endDate,
+      timestampVar
     ]
   );
 };
