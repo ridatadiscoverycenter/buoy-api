@@ -6,6 +6,7 @@ const {
   getLatestRecord,
   getRecordsSince,
   getRecordsRange,
+  getHourlyRecordsRange,
 } = require("@/clients/breathepvd.js");
 
 SENSOR_IDS = [
@@ -39,6 +40,9 @@ const getTimestampVar = (table) => {
   return table === "sensor" ? "local_timestamp" : "timestamp_local";
 };
 
+const getVariables = (table) => {
+  return table === "sensor" ?  ['co2_corrected_avg_t_drift_applied', 'co_corrected'] : ['pm1', 'pm25', 'pm10'];
+};
 const RANGES = {
   lastone: () => (sensor, table, timestampVar, variables) =>
     getLatestRecord(sensor, table, timestampVar, variables),
@@ -55,7 +59,19 @@ const RANGES = {
       timestampVar,
       startDate,
       endDate,
-      variables
+      variables,
+    );
+  },
+  hourly: (req) => {
+    const startDate = new Date(req.query.start);
+    const endDate = req.query.end ? new Date(req.query.end) : new Date();
+    return (sensor, table, timestampVar, variables) => getHourlyRecordsRange(
+      sensor,
+      table,
+      timestampVar,
+      startDate,
+      endDate,
+      variables,
     );
   },
 };
@@ -98,6 +114,7 @@ router.param("range", (req, res, next, range) => {
  *           - lastday
  *           - lastweek
  *           - range
+ *           - hourly
  *       - in: query
  *         name: start
  *         required: false
@@ -123,7 +140,8 @@ router.get(
     const result = await req.queryFn(
       req.params.table,
       req.params.sensor_id,
-      getTimestampVar(req.params.table)
+      getTimestampVar(req.params.table),
+      getVariables(req.params.table)
     );
     res.send(result);
   })
@@ -175,6 +193,7 @@ router.get(
  *           - lastday
  *           - lastweek
  *           - range
+ *           - hourly
  *       - in: query
  *         name: start
  *         required: false
@@ -200,7 +219,8 @@ router.get(
     const result = await req.queryFn(
       req.params.table,
       req.params.sensor,
-      getTimestampVar(req.params.table)
+      getTimestampVar(req.params.table),
+      getVariables(req.params.table)
     );
     res.send(result);
   })
