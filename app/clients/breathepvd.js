@@ -59,8 +59,9 @@ const getRecordsRange = async (
   variables
 ) => {
   const columns = getColumns(variables);
-  return await query(`SELECT ? FROM ?? WHERE ?? >= ? and ?? < ?`, [
+  return await query(`SELECT ?, ?? FROM ?? WHERE ?? >= ? and ?? < ?`, [
     columns,
+    timestampVar,
     `${sensor}_${table}`,
     timestampVar,
     startDate,
@@ -82,7 +83,7 @@ const getHourlyRecordsRange = async (
     `SELECT MIN( ?? ) as timestamp, ?
     FROM ?? 
     WHERE ?? >= ? and ?? < ?
-    GROUP BY date_format(timestamp, '%Y-%m-%d %H')`,
+    GROUP BY date_format(??, '%Y-%m-%d %H')`,
     [
       timestampVar,
       columns,
