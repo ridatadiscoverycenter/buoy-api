@@ -41,7 +41,15 @@ const getTimestampVar = (table) => {
 };
 
 const getVariables = (table) => {
-  return table === "sensor" ?  ['co2_corrected_avg_t_drift_applied', 'co_corrected'] : ['pm1', 'pm25', 'pm10'];
+  return table === "sensor"
+    ? [
+        "datetime",
+        "node_file_id",
+        "node_id",
+        "co2_corrected_avg_t_drift_applied",
+        "co_corrected",
+      ]
+    : ["timestamp", "sn", "`geo.lat`", "`geo.lon`", "pm1", "pm25", "pm10", "ws"];
 };
 const RANGES = {
   lastone: () => (sensor, table, timestampVar, variables) =>
@@ -53,26 +61,28 @@ const RANGES = {
   range: (req) => {
     const startDate = new Date(req.query.start);
     const endDate = req.query.end ? new Date(req.query.end) : new Date();
-    return (sensor, table, timestampVar, variables) => getRecordsRange(
-      sensor,
-      table,
-      timestampVar,
-      startDate,
-      endDate,
-      variables,
-    );
+    return (sensor, table, timestampVar, variables) =>
+      getRecordsRange(
+        sensor,
+        table,
+        timestampVar,
+        startDate,
+        endDate,
+        variables,
+      );
   },
   hourly: (req) => {
     const startDate = new Date(req.query.start);
     const endDate = req.query.end ? new Date(req.query.end) : new Date();
-    return (sensor, table, timestampVar, variables) => getHourlyRecordsRange(
-      sensor,
-      table,
-      timestampVar,
-      startDate,
-      endDate,
-      variables,
-    );
+    return (sensor, table, timestampVar, variables) =>
+      getHourlyRecordsRange(
+        sensor,
+        table,
+        timestampVar,
+        startDate,
+        endDate,
+        variables,
+      );
   },
 };
 
