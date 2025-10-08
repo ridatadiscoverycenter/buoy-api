@@ -22,9 +22,9 @@ const getColumns = (variables = ALL_COLUMNS) => {
 const getAvgColumns = (variables) => {
   // note - this is okay because this code is the only source of variable names - this would
   // be bad if we allowed user defined variables here
-    return (columns = variables.map((variable) =>
+    return (columns = [...variables.map((variable) =>
       SqlString.raw(`AVG( ${variable} ) as ${variable}`)
-    ));
+    )]);
 };
 
 const getLatestRecord = async (sensor, table, timestampVar, variables) => {
@@ -76,23 +76,27 @@ const getHourlyRecordsRange = async (
   timestampVar,
   startDate,
   endDate,
-  variables
+  variables,
+  groupVariables
 ) => {
   const columns = getAvgColumns(variables);
+  const groupColumns = getColumns(groupVariables)
   return await query(
-    `SELECT MIN( ?? ) as timestamp, ?
+    `SELECT MIN( ?? ) as timestamp, ?, ?
     FROM ?? 
     WHERE ?? >= ? and ?? < ?
-    GROUP BY date_format(??, '%Y-%m-%d %H')`,
+    GROUP BY date_format(??, '%Y-%m-%d %H'), ?`,
     [
       timestampVar,
+      groupColumns,
       columns,
       `${sensor}_${table}`,
       timestampVar,
       startDate,
       timestampVar,
       endDate,
-      timestampVar
+      timestampVar,
+      groupColumns
     ]
   );
 };

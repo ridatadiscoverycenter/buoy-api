@@ -43,13 +43,19 @@ const getTimestampVar = (table) => {
 const getVariables = (table) => {
   return table === "sensor"
     ? [
-        "datetime",
-        "node_file_id",
-        "node_id",
         "co2_corrected_avg_t_drift_applied",
         "co_corrected",
       ]
-    : ["timestamp", "sn", "`geo.lat`", "`geo.lon`", "pm1", "pm25", "pm10", "ws"];
+    : ["`geo.lat`", "`geo.lon`", "pm1", "pm25", "pm10", "ws"];
+};
+const getGroupVariables = (table) => {
+  return table === "sensor"
+    ? [
+        "datetime",
+        "node_file_id",
+        "node_id",
+      ]
+    : ["timestamp", "sn"];
 };
 const RANGES = {
   lastone: () => (sensor, table, timestampVar, variables) =>
@@ -74,7 +80,7 @@ const RANGES = {
   hourly: (req) => {
     const startDate = new Date(req.query.start);
     const endDate = req.query.end ? new Date(req.query.end) : new Date();
-    return (sensor, table, timestampVar, variables) =>
+    return (sensor, table, timestampVar, variables, groupVariables) =>
       getHourlyRecordsRange(
         sensor,
         table,
@@ -82,6 +88,7 @@ const RANGES = {
         startDate,
         endDate,
         variables,
+        groupVariables,
       );
   },
 };
@@ -151,7 +158,8 @@ router.get(
       req.params.table,
       req.params.sensor_id,
       getTimestampVar(req.params.table),
-      getVariables(req.params.table)
+      getVariables(req.params.table),
+      getGroupVariables(req.params.table)
     );
     res.send(result);
   })
@@ -230,7 +238,8 @@ router.get(
       req.params.table,
       req.params.sensor,
       getTimestampVar(req.params.table),
-      getVariables(req.params.table)
+      getVariables(req.params.table),
+      getGroupVariables(req.params.table),
     );
     res.send(result);
   })
