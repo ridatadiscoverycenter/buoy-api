@@ -32,13 +32,64 @@ const getGroupColumns = (variables) => {
   ))
 }
 
+const deriveUtcTimestamp = (value) => {
+  if (!value) {
+    return null;
+  }
+
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.valueOf())) {
+    return null;
+  }
+
+  return date.toISOString();
+};
+
+const attachUtcTimestamp = (rows, primaryKey, fallbackKey) => {
+  if (!Array.isArray(rows) || rows.length === 0) {
+    return rows;
+  }
+
+  return rows.map((row) => {
+    const timestampValue =
+      (primaryKey && row[primaryKey]) ||
+      (fallbackKey && row[fallbackKey]);
+
+    const utcTimestamp = deriveUtcTimestamp(timestampValue);
+    if (!utcTimestamp) {
+      return row;
+    }
+
+    // Filter out timestamp fields and date_format columns
+    const cleanedRow = Object.keys(row).reduce((acc, key) => {
+      // Skip the original timestamp fields and any date_format columns
+      if (key === primaryKey || key === fallbackKey || key.startsWith('date_format(')) {
+        return acc;
+      }
+      acc[key] = row[key];
+      return acc;
+    }, {});
+    
+    return {
+      ...cleanedRow,
+      timestamp_utc: utcTimestamp,
+    };
+  });
+};
+
 const getLatestRecord = async (sensor, table, timestampVar, variables) => {
-  const columns = getColumns(variables);
-  return await query(`SELECT ? FROM ?? ORDER BY ?? desc LIMIT 1`, [
+  // Ensure timestamp is included without duplicating
+  const allVars = variables.includes(timestampVar) 
+    ? variables 
+    : [...variables, timestampVar];
+  const columns = getColumns(allVars);
+  const rows = await query(`SELECT ? FROM ?? ORDER BY ?? desc LIMIT 1`, [
     columns,
-    `${sensor}_${table}`,
+    `${table}_${sensor}`,
     timestampVar,
   ]);
+
+  return attachUtcTimestamp(rows, timestampVar);
 };
 
 const getRecordsSince = async (
@@ -48,11 +99,17 @@ const getRecordsSince = async (
   daysAgo,
   variables
 ) => {
-  const columns = getColumns(variables);
-  return await query(
+  // Ensure timestamp is included without duplicating
+  const allVars = variables.includes(timestampVar) 
+    ? variables 
+    : [...variables, timestampVar];
+  const columns = getColumns(allVars);
+  const rows = await query(
     `SELECT ? FROM ?? WHERE ?? >= DATE_SUB(NOW(), interval ? day)`,
-    [columns, `${sensor}_${table}`, timestampVar, daysAgo]
+    [columns, `${table}_${sensor}`, timestampVar, daysAgo]
   );
+
+  return attachUtcTimestamp(rows, timestampVar);
 };
 
 const getRecordsRange = async (
@@ -63,16 +120,21 @@ const getRecordsRange = async (
   endDate,
   variables
 ) => {
-  const columns = getColumns(variables);
-  return await query(`SELECT ?, ?? FROM ?? WHERE ?? >= ? and ?? < ?`, [
+  // Ensure timestamp is included without duplicating
+  const allVars = variables.includes(timestampVar) 
+    ? variables 
+    : [...variables, timestampVar];
+  const columns = getColumns(allVars);
+  const rows = await query(`SELECT ? FROM ?? WHERE ?? >= ? and ?? < ?`, [
     columns,
-    timestampVar,
-    `${sensor}_${table}`,
+    `${table}_${sensor}`,
     timestampVar,
     startDate,
     timestampVar,
     endDate,
   ]);
+
+  return attachUtcTimestamp(rows, timestampVar);
 };
 
 const getHourlyRecordsRange = async (
@@ -86,7 +148,7 @@ const getHourlyRecordsRange = async (
 ) => {
   const columns = getAvgColumns(variables);
   const groupColumns = getGroupColumns(groupVariables)
-  return await query(
+  const rows = await query(
     `SELECT MIN( ?? ) as timestamp, date_format(??, '%Y-%m-%d %H'), ?, ?
     FROM ?? 
     WHERE ?? >= ? and ?? < ?
@@ -96,7 +158,7 @@ const getHourlyRecordsRange = async (
       timestampVar,
       groupColumns,
       columns,
-      `${sensor}_${table}`,
+      `${table}_${sensor}`,
       timestampVar,
       startDate,
       timestampVar,
@@ -104,6 +166,9 @@ const getHourlyRecordsRange = async (
       timestampVar,
     ]
   );
+
+  // Adds a derived UTC timestamp for clients expecting ISO strings.
+  return attachUtcTimestamp(rows, "timestamp", timestampVar);
 };
 module.exports = {
   getLatestRecord,

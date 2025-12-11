@@ -33,4 +33,4 @@ The built/deployed version uses the `.env` file with the same keys but with the 
 
 ## Production Deployment
 
-The deployment lives on the BKE cluster `bkpd-rancher`. See https://github.com/brown-ccv/k8s-deploy-bke/tree/main/riddc-api for more info on the deployment and troubleshooting.
+The deployment lives on the RKE2 cluster `bked`. See https://github.com/brown-ccv/k8s-deploy-bke/tree/main/riddc-api for more info on the deployment and troubleshooting.
