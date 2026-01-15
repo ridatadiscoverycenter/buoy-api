@@ -50,9 +50,15 @@ app.use(function (err, req, res, _next) {
   res.locals.message = err.message;
   res.locals.error = req.app.get("env") === "development" ? err : {};
 
+  // Log full error for debugging
+  console.error("Error:", err);
+
   // render the error page
   res.status(err.status || 500);
-  res.json({ error: err.message });
+  res.json({ 
+    error: err.message || err.code || "Internal server error",
+    ...(req.app.get("env") === "development" && { stack: err.stack })
+  });
 });
 
 app.listen(port, () => console.log(`RIDDC API listening on port ${port}!`));

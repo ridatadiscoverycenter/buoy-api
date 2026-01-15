@@ -155,8 +155,8 @@ router.get(
   "/:table/:sensor_id/:range",
   ash(async (req, res) => {
     const result = await req.queryFn(
-      req.params.table,
       req.params.sensor_id,
+      req.params.table,
       getTimestampVar(req.params.table),
       getVariables(req.params.table),
       getGroupVariables(req.params.table)
@@ -235,8 +235,8 @@ router.get(
   "/:table/:sensor_id/:range",
   ash(async (req, res) => {
     const result = await req.queryFn(
+      req.params.sensor_id,
       req.params.table,
-      req.params.sensor,
       getTimestampVar(req.params.table),
       getVariables(req.params.table),
       getGroupVariables(req.params.table),
