@@ -6,7 +6,7 @@
   "author": "Fernando Gelin, Mary McGrath",
   "license": "MIT",
   "engines": {
-    "node": ">16.0.0"
+    "node": ">=26.0.0"
   },
   "scripts": {
     "start": "dotenv -e .env node app/server.js",
