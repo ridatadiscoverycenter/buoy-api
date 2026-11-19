@@ -6,7 +6,7 @@
   "author": "Fernando Gelin, Mary McGrath",
   "license": "MIT",
   "engines": {
-    "node": ">16.0.0"
+    "node": ">=26.0.0"
   },
   "scripts": {
     "start": "dotenv -e .env node app/server.js",
@@ -37,6 +37,7 @@
     "module-alias": "^2.2.2",
     "morgan": "^1.10.0",
     "mysql2": "^3.14.1",
+    "sqlstring": "^2.3.3",
     "swagger-jsdoc": "^6.0.1",
     "swagger-ui-express": "^4.1.6"
   },
